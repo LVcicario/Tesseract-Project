@@ -19,8 +19,8 @@
 
 <!-- v2.1 overlays -->
 <div id="chromAb" aria-hidden="true"></div>
-<div class="vertexmark" id="vmark">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots"></span></div>
-<aside id="explorer" aria-label="Explorateur de bloc">
+<div class="vertexmark" id="vmark" role="status" aria-live="polite" aria-label="Compteur de blocs minés">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span></div>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true">
   <div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div>
   <div id="xBody"></div>
 </aside>
@@ -44,7 +44,7 @@
 <div id="cli">
 <div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
 <div class="chist" id="chist"></div>
-<div class="ci"><span class="cp">tesseract@chain:~$</span><input class="cin" id="cin" autocomplete="off" spellcheck="false"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée. Tapez help pour la liste des commandes.</span></div>
 </div>
 
 <div class="hud">

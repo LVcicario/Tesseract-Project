@@ -267,16 +267,72 @@
         <div class="lv3">       ├─ tx₂ (${NAMES[idx%NAMES.length]}→${NAMES[(idx+3)%NAMES.length]}: ${(7+idx*1.7).toFixed(2)} TSC)</div>
         <div class="lv3">       └─ tx₃ (${NAMES[(idx+1)%NAMES.length]}→${NAMES[(idx+2)%NAMES.length]}: ${(3+idx*.8).toFixed(2)} TSC)</div>
       </div>`;
-    $('explorer').classList.add('open');
+    const ex=$('explorer');
+    ex.classList.add('open');
+    ex.setAttribute('aria-hidden','false');
+    openExplorer._prevFocus=document.activeElement;
+    // Focus the close button so keyboard users can dismiss immediately.
+    const closeBtn=$('xhClose');if(closeBtn)closeBtn.focus();
   }
-  const xhClose=$('xhClose');if(xhClose)xhClose.addEventListener('click',()=>$('explorer').classList.remove('open'));
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')$('explorer').classList.remove('open')});
-
-  // HUD wallet click → explorer-like (just a quick toast via alert fallback, or open xray)
-  const hwallet=$('hwallet');
-  if(hwallet)hwallet.addEventListener('click',()=>{
-    alert(`Wallet\n\nAdresse : ${STATE.wallet.addr}\nSolde   : ${STATE.wallet.balance.toLocaleString('fr-FR')} TSC\nCréé le : ${new Date(STATE.wallet.createdAt).toLocaleString('fr-FR')}\n\nTapez "wallet" dans le CLI pour plus de commandes.`);
+  function closeExplorer(){
+    const ex=$('explorer');
+    if(!ex||!ex.classList.contains('open'))return;
+    ex.classList.remove('open');
+    ex.setAttribute('aria-hidden','true');
+    const prev=openExplorer._prevFocus;
+    if(prev&&prev.focus)prev.focus();
+  }
+  const xhClose=$('xhClose');if(xhClose)xhClose.addEventListener('click',closeExplorer);
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Escape')return;
+    const ex=$('explorer');
+    if(ex&&ex.classList.contains('open')){e.stopPropagation();closeExplorer()}
   });
+  // Focus trap inside #explorer while open.
+  (function installExplorerFocusTrap(){
+    const ex=$('explorer');if(!ex)return;
+    ex.addEventListener('keydown',e=>{
+      if(e.key!=='Tab'||!ex.classList.contains('open'))return;
+      const focusables=ex.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if(!focusables.length)return;
+      const first=focusables[0],last=focusables[focusables.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+    });
+  })();
+
+  // HUD wallet click → accessible modal (replaces blocking alert()).
+  const hwallet=$('hwallet');
+  if(hwallet){
+    hwallet.setAttribute('role','button');
+    hwallet.setAttribute('tabindex','0');
+    const openWalletModal=()=>{
+      if(!window.TSCUi){return}
+      const addr=STATE.wallet.addr||'—';
+      const bal=(STATE.wallet.balance||0).toLocaleString('fr-FR',{maximumFractionDigits:4});
+      const created=STATE.wallet.createdAt?new Date(STATE.wallet.createdAt).toLocaleString('fr-FR'):'—';
+      const priv=(STATE.wallet.priv||'').slice(0,18)+'… (masqué)';
+      window.TSCUi.modal({
+        title:'Votre wallet',
+        body:
+          '<div class="row"><span class="label">Adresse</span><span class="val"><code>'+addr+'</code></span></div>'+
+          '<div class="row"><span class="label">Solde</span><span class="val"><strong style="color:var(--gd)">'+bal+' TSC</strong></span></div>'+
+          '<div class="row"><span class="label">Clé privée</span><span class="val"><code>'+priv+'</code></span></div>'+
+          '<div class="row"><span class="label">Créé le</span><span class="val">'+created+'</span></div>'+
+          '<p style="margin-top:16px;color:var(--wk);font-size:11px;line-height:1.6">Votre identité a été générée dans votre navigateur et ne quitte jamais cet appareil. Tapez <code>wallet</code> dans le CLI pour plus d\'opérations.</p>',
+        actions:[
+          {label:'Copier l\'adresse',kind:'ghost',onClick:()=>{
+            if(navigator.clipboard)navigator.clipboard.writeText(addr).then(()=>window.TSCUi.toast('Adresse copiée',{level:'success'}),()=>window.TSCUi.toast('Copie impossible',{level:'warn'}));
+          },closeOnClick:false},
+          {label:'Fermer',kind:'primary'}
+        ]
+      });
+    };
+    hwallet.addEventListener('click',openWalletModal);
+    hwallet.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();openWalletModal()}
+    });
+  }
 
   // ═══ Outro : partage X avec lien dynamique ═══
   const shareX=$('shareX');
