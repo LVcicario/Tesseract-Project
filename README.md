@@ -1,8 +1,18 @@
 # TESSERACT.CHAIN
 
-> Une exploration interactive de la Blockchain 3.0, projetée depuis la 4ᵉ dimension.
+[![Deploy to GitHub Pages](https://github.com/LVcicario/Tesseract-Project/actions/workflows/deploy.yml/badge.svg)](https://github.com/LVcicario/Tesseract-Project/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-00f0ff.svg)](./LICENSE)
+[![No dependencies](https://img.shields.io/badge/deps-zero-8b5cf6.svg)](#stack-technique)
+[![Made with SHA--256](https://img.shields.io/badge/crypto-SHA--256%20natif-ff00d4.svg)](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto)
 
-Un site en fichier unique à l'origine, devenu un mini-univers : **tesseract 4D rendu en WebGL**, **minage SHA-256 réel**, **smart contracts exécutables**, **cascade d'invalidation visible en direct**, **simulation multi-nœuds**, **terminal CLI interactif**. Zéro framework, zéro build step — juste du HTML, du CSS et du JavaScript vanille.
+> Deux portes d'entrée. Une seule direction artistique.
+> **Un explorer libre** pour ressentir la Blockchain 3.0 comme une œuvre.
+> **Une académie en 6 chapitres** pour la comprendre comme un jeune étudiant·e.
+
+- 🚀 **[Explorer libre](./index.html)** — tesseract 4D, minage SHA-256 réel, tamper cascade, CLI interactif, wallet persistant, mode x-ray Konami.
+- 🎓 **[Académie](./academy.html)** — 6 chapitres (hash → bloc → PoW → identités → consensus → smart contracts) avec démos live, défis validés et quizz.
+
+Zéro framework, zéro build, zéro compte. Ouvre `index.html` et tu es dedans.
 
 ```
 ┌─ TESSERACT.CHAIN // v2.1 ────────────────────────────────────┐
@@ -165,20 +175,40 @@ Identité générée au premier chargement via `crypto.getRandomValues` + SHA-25
 
 ```
 .
-├── index.html                      # Point d'entrée
+├── index.html                          # Explorer libre
+├── academy.html                        # Landing Académie
+├── academy/
+│   ├── 1-le-hash.html                  # Chapitre 1 — Le hash
+│   ├── 2-le-bloc.html                  # Chapitre 2 — Le bloc
+│   ├── 3-course-au-nonce.html          # Chapitre 3 — La course au nonce
+│   ├── 4-les-identites.html            # Chapitre 4 — Les identités (ECDSA réel)
+│   ├── 5-consensus.html                # Chapitre 5 — Le consensus
+│   └── 6-les-programmes.html           # Chapitre 6 — Les smart contracts
 ├── styles/
-│   └── main.css                    # Tout le style, organisé par section
+│   └── main.css                        # Tout le style, organisé par banner
 ├── src/
-│   ├── core.js                     # Moteur : tesseract, mining, CLI, tamper
-│   └── extensions.js               # Couche v2.1 : wallet, VM, cinematic, explorer
+│   ├── lifecycle.js                    # Registre timers / rAF / Tone cleanup
+│   ├── ui.js                           # Primitives toast + modal accessibles
+│   ├── core.js                         # Moteur explorer
+│   ├── extensions.js                   # Wallet, VM, cinematic, explorer
+│   ├── academy.js                      # Progression, glossaire flottant
+│   └── chapter-{1..6}.js               # Comportement par chapitre
 ├── assets/
-│   └── favicon.svg                 # Favicon tesseract inline
+│   ├── favicon.svg
+│   └── og-image.svg                    # Open Graph 1200×630
 ├── archive/
-│   ├── v1-tesseract-chain.html              # Version monolithique d'origine
-│   └── v2-tesseract-chain-monolith.html     # v2.1 avant découpage
-├── docs/
+│   ├── v1-tesseract-chain.html         # Monolithe original (Claude Artifacts)
+│   └── v2-tesseract-chain-monolith.html
+├── .github/
+│   ├── workflows/deploy.yml            # GitHub Pages auto-deploy
+│   ├── ISSUE_TEMPLATE/                 # bug, feature, question
+│   └── PULL_REQUEST_TEMPLATE.md
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── robots.txt
+├── sitemap.xml
 ├── README.md
-├── LICENSE                         # MIT
+├── LICENSE                             # MIT
 └── .gitignore
 ```
 
@@ -226,7 +256,9 @@ Des progrès restent à faire : focus trap dans l'explorer, navigation clavier c
 - **v1** — Monolithe de 1268 lignes généré en un shot avec [Claude Artifacts](https://claude.ai). Toutes les fonctionnalités visuelles et le minage étaient déjà là.
 - **v2.0** — Meta SEO, favicon SVG, accessibilité, enrichissements pédagogiques par section (bandeau live, diagramme 1D→4D, sources, 4ᵉ nœud chronologique, leaderboard, CTAs).
 - **v2.1** — Ajout d'une couche blockchain vivante : wallet généré et persisté, mempool en temps réel, VM de smart contracts, explorateur de blocs, cinématique section-aware, mode rayons-X Konami.
-- **v2.2** *(cette version)* — Refactor vers une structure modulaire. Zéro nouvelle fonctionnalité, uniquement de l'hygiène de code.
+- **v2.2** — Refactor vers une structure modulaire. Zéro nouvelle fonctionnalité, uniquement de l'hygiène de code.
+- **v2.3** *(cette version)* — Lifecycle registry (timers & rAF cleanup), toast/modal primitives, event bus explicite entre core et extensions, baseline a11y, mining non-bloquant.
+- **v3.0 Académie** — Seconde porte d'entrée : parcours pédagogique en 6 chapitres avec défis, quizz et progression persistée. Glossaire flottant, onboarding premier-run, tamper pré-explicatif, difficulté mining réglable, hash sandbox. Polish Phase 4 (design tokens, SRI, og:image, JSON-LD Course, tap targets 44 px). Industrialisation Phase 5 (GitHub Actions Pages, CONTRIBUTING/CoC, templates issue/PR, sitemap, robots).
 
 ## Crédits
 

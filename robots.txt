@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lvcicario.github.io/Tesseract-Project/sitemap.xml
