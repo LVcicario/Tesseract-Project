@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TESSERACT.CHAIN</title>
+<link rel="icon" href="data:,">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--cy:#00f0ff;--mg:#ff00d4;--vi:#8b5cf6;--gd:#ffcc3d;--rd:#ff2244;--gr:#00ff88;--w:#e8ecff;--d:#6a7599;--wk:#3b4366;--b:rgba(139,92,246,.14);--m:ui-monospace,'SF Mono',Menlo,Consolas,monospace;--s:ui-sans-serif,-apple-system,'Segoe UI',sans-serif;--dp:'Impact','Arial Narrow Bold',ui-sans-serif,sans-serif}
+html,body{background:#000;color:var(--w);font-family:var(--s);overflow-x:hidden;cursor:none;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;position:relative}
+.cursor,.cdot{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;will-change:transform}
+.cursor{width:24px;height:24px;border:1px solid var(--cy);border-radius:50%;transition:width .22s,height .22s,border-color .22s,background .22s,transform .22s}
+.cdot{width:4px;height:4px;background:var(--cy);border-radius:50%;box-shadow:0 0 14px var(--cy)}
+.cursor.hov{width:60px;height:60px;border-color:var(--mg);background:rgba(255,0,212,.08)}
+.cursor.drag{width:46px;height:46px;border-color:var(--gd);background:rgba(255,204,61,.1)}
+.cursor.click{transform:translate(-50%,-50%) scale(.55)}
+.cursor.danger{border-color:var(--rd);background:rgba(255,34,68,.15)}
+
+#boot{position:fixed;inset:0;z-index:10000;background:#000;padding:50px max(40px,7vw);font-family:var(--m);font-size:12.5px;line-height:1.85;color:var(--d);overflow:hidden;display:flex;flex-direction:column;transition:opacity .9s,filter .3s}
+#boot.flash{filter:brightness(6) invert(1) contrast(2)}
+#boot.gone{opacity:0;pointer-events:none}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,240,255,0) 0,rgba(0,240,255,0) 2px,rgba(0,240,255,.025) 3px,rgba(0,240,255,0) 4px);pointer-events:none}
+.crt{position:absolute;inset:0;background:radial-gradient(ellipse 120% 90% at 50% 50%,transparent 60%,rgba(0,0,0,.9) 100%);pointer-events:none}
+.boot-head{display:flex;justify-content:space-between;color:var(--wk);font-size:10.5px;letter-spacing:.18em;margin-bottom:28px;padding-bottom:10px;border-bottom:1px solid var(--b)}
+#bootLog{flex:1;min-height:0;overflow:hidden}
+.bl{opacity:0;animation:bla .12s forwards;white-space:pre}
+@keyframes bla{to{opacity:1}}
+.bl.ok{color:var(--gr)}.bl.info{color:var(--cy)}.bl.warn{color:var(--gd)}.bl.head{color:var(--w);font-weight:600;margin-top:8px}
+.bl.ascii{color:var(--cy);font-size:11px;line-height:1.2;text-shadow:0 0 20px rgba(0,240,255,.7);margin:18px 0}
+.bp{margin-top:32px;opacity:0;animation:bla .3s forwards;display:flex;align-items:center;gap:12px;font-size:14px;color:var(--cy);letter-spacing:.1em}
+.bp.ready{animation:pb 1.3s infinite}
+@keyframes pb{0%,100%{opacity:1;text-shadow:0 0 24px var(--cy)}50%{opacity:.35}}
+.key{display:inline-block;padding:4px 11px;border:1px solid var(--cy);background:rgba(0,240,255,.1);font-weight:700;letter-spacing:.25em}
+
+#flash{position:fixed;inset:0;z-index:9998;background:#fff;opacity:0;pointer-events:none;transition:opacity .15s}
+#flash.on{opacity:.85}
+#redFlood{position:fixed;inset:0;background:radial-gradient(ellipse at center,rgba(255,34,68,.4),rgba(255,34,68,.1) 55%,transparent 90%);z-index:50;opacity:0;pointer-events:none;transition:opacity .3s}
+#redFlood.on{opacity:1}
+
+#bgCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:1}
+.grid-ov{position:fixed;inset:0;z-index:2;pointer-events:none;background-image:linear-gradient(rgba(139,92,246,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.07) 1px,transparent 1px);background-size:90px 90px;mask-image:radial-gradient(ellipse 100% 80% at 50% 50%,black 5%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse 100% 80% at 50% 50%,black 5%,transparent 75%)}
+
+.hud{position:fixed;top:0;left:0;right:0;padding:18px 36px;display:flex;justify-content:space-between;align-items:center;z-index:100;font-family:var(--m);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--d)}
+.hud>div{display:flex;gap:22px;align-items:center}
+.hud strong{color:var(--cy);font-weight:600}
+.hd{width:7px;height:7px;background:var(--cy);border-radius:50%;box-shadow:0 0 12px var(--cy);animation:hp 1.3s infinite}
+@keyframes hp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+.hb{padding:5px 12px;border:1px solid var(--b);background:rgba(0,0,0,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--d);font-family:inherit;font-size:10px;letter-spacing:.22em;cursor:none;text-transform:uppercase;transition:all .2s}
+.hb:hover{border-color:var(--cy);color:var(--cy)}
+.hb.active{border-color:var(--cy);color:var(--cy);background:rgba(0,240,255,.12)}
+
+.dhint{position:fixed;bottom:30px;right:36px;font-family:var(--m);font-size:10px;letter-spacing:.25em;color:var(--wk);text-transform:uppercase;z-index:100;pointer-events:none;animation:hf 6s forwards;animation-delay:3s}
+@keyframes hf{0%,60%{opacity:.6}100%{opacity:0}}
+.dhint strong{color:var(--cy)}
+
+main{position:relative;z-index:10}
+section{min-height:100vh;padding:140px 36px;display:flex;align-items:center}
+.inner{max-width:1280px;width:100%;margin:0 auto;position:relative}
+
+#hero{text-align:center;flex-direction:column;justify-content:center;padding-top:120px}
+.hk{font-family:var(--m);font-size:11px;letter-spacing:.55em;color:var(--cy);text-transform:uppercase;margin-bottom:32px;opacity:0;animation:fu 1s .3s forwards}
+.ht{font-family:var(--dp);font-size:clamp(68px,13vw,200px);font-weight:900;line-height:.86;letter-spacing:-.02em;margin-bottom:44px;background:linear-gradient(180deg,#fff 0%,#fff 30%,var(--cy) 70%,var(--vi) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 80px rgba(0,240,255,.25));text-transform:uppercase}
+.ht>span{display:inline-block;opacity:0;animation:hl .35s forwards}
+@keyframes hl{0%{opacity:0;filter:blur(12px);transform:translateY(25px) scale(1.5)}100%{opacity:1;filter:blur(0);transform:translateY(0) scale(1)}}
+.hs{font-size:clamp(16px,1.9vw,23px);color:var(--d);max-width:680px;margin:0 auto 60px;font-weight:300;line-height:1.5;opacity:0;animation:fu 1s 2.5s forwards}
+.hs em{color:var(--cy);font-style:normal;font-weight:400}
+.shint{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);font-family:var(--m);font-size:10px;letter-spacing:.35em;color:var(--d);text-transform:uppercase;opacity:0;animation:fu 1s 3.2s forwards}
+.shint::after{content:'';display:block;width:1px;height:54px;background:linear-gradient(to bottom,var(--cy),transparent);margin:18px auto 0;animation:sc 2.2s infinite}
+@keyframes fu{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sc{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+.sl{font-family:var(--m);font-size:10px;letter-spacing:.55em;color:var(--cy);text-transform:uppercase;margin-bottom:26px;display:inline-flex;align-items:center;gap:16px}
+.sl::before{content:'';width:42px;height:1px;background:var(--cy);box-shadow:0 0 8px var(--cy)}
+.st{font-family:var(--dp);font-size:clamp(40px,6vw,82px);font-weight:700;line-height:1;letter-spacing:-.02em;margin-bottom:34px;background:linear-gradient(180deg,#fff 0%,#8090b8 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
+.st em{font-style:normal;background:linear-gradient(180deg,var(--cy) 0%,var(--mg) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.si{font-size:17px;line-height:1.75;color:var(--d);max-width:720px;margin-bottom:80px;font-weight:300}
+.si strong{color:var(--w);font-weight:500}
+
+#concept .gd{display:grid;grid-template-columns:1.1fr 1fr;gap:100px;align-items:start}
+.qb{padding:0 0 0 42px;border-left:1px solid var(--cy);position:relative}
+.qb::before{content:'◆';position:absolute;left:-8px;top:-4px;color:var(--cy);background:#000;padding:0 2px;font-size:14px;text-shadow:0 0 15px var(--cy)}
+.qt{font-family:var(--dp);font-size:clamp(22px,2.3vw,34px);line-height:1.35;font-weight:500;color:var(--w);letter-spacing:-.01em}
+.qt mark{background:none;color:var(--cy);font-weight:700;text-shadow:0 0 16px rgba(0,240,255,.4)}
+.qm{margin-top:30px;font-family:var(--m);font-size:10px;letter-spacing:.35em;color:var(--wk);text-transform:uppercase}
+.ct p{font-size:16px;line-height:1.8;color:var(--d);margin-bottom:22px}
+.ct strong{color:var(--w);font-weight:500}
+.cn{font-family:var(--m);font-size:12.5px;padding:22px 22px 22px 24px;border-left:2px solid var(--mg);background:linear-gradient(90deg,rgba(255,0,212,.08),transparent 80%);color:var(--w);line-height:1.7;margin-top:24px}
+.cn em{color:var(--mg);font-style:normal;font-weight:600}
+
+.dg{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--b);border:1px solid var(--b)}
+.dc{background:rgba(5,8,19,.85);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);padding:52px 46px;min-height:440px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:all .5s cubic-bezier(.2,.8,.2,1);cursor:none}
+.dc::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 120% -20%,var(--c) 0%,transparent 55%);opacity:.1;transition:opacity .5s}
+.dc::after{content:'';position:absolute;inset:0;border:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+.dc:hover{background:rgba(12,18,42,.95);transform:translateY(-6px)}
+.dc:hover::before{opacity:.35}
+.dc:hover::after{border-color:var(--c);box-shadow:inset 0 0 40px rgba(0,240,255,.08)}
+.dn{font-family:var(--m);font-size:10px;letter-spacing:.55em;color:var(--c);margin-bottom:26px}
+.di{width:58px;height:58px;margin-bottom:34px;stroke:var(--c);stroke-width:1.5;fill:none;filter:drop-shadow(0 0 14px var(--c))}
+.dt{font-family:var(--dp);font-size:34px;font-weight:800;margin-bottom:20px;letter-spacing:-.01em;color:#fff;text-transform:uppercase}
+.dd{font-size:14px;line-height:1.75;color:var(--d);margin-bottom:30px;flex:1}
+.ds{display:flex;justify-content:space-between;font-family:var(--m);font-size:11px;letter-spacing:.18em;color:var(--wk);padding-top:22px;border-top:1px solid var(--b);text-transform:uppercase}
+.ds strong{color:var(--c);font-weight:700}
+
+.tl{position:relative;margin-top:40px}
+.tlt{position:absolute;top:96px;left:5%;right:5%;height:1px;background:linear-gradient(90deg,var(--vi),var(--cy),var(--mg));opacity:.4;box-shadow:0 0 12px rgba(0,240,255,.3)}
+.tli{display:grid;grid-template-columns:repeat(3,1fr);gap:44px;position:relative}
+.tit{padding:44px 32px;background:rgba(5,8,19,.78);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--b);position:relative;transition:all .4s;cursor:none}
+.tit:hover{border-color:var(--tc);box-shadow:0 15px 60px rgba(0,240,255,.15);transform:translateY(-6px)}
+.tnd{position:absolute;top:-9px;left:32px;width:16px;height:16px;background:var(--tc);border-radius:50%;box-shadow:0 0 28px var(--tc),0 0 50px var(--tc);animation:hp 2s infinite}
+.ty{font-family:var(--m);font-size:10px;letter-spacing:.32em;color:var(--tc);margin-bottom:16px;text-transform:uppercase}
+.tv{font-family:var(--dp);font-size:38px;font-weight:900;margin-bottom:22px;color:var(--w);letter-spacing:-.02em;text-transform:uppercase}
+.td{font-size:13px;line-height:1.7;color:var(--d);margin-bottom:26px}
+.tgs{display:flex;flex-wrap:wrap;gap:8px}
+.tg{font-family:var(--m);font-size:9px;padding:4px 11px;border:1px solid var(--tc);color:var(--tc);letter-spacing:.18em}
+
+.sw{background:rgba(5,8,19,.6);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid var(--b);padding:40px;position:relative;overflow:hidden}
+.sw::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cy),transparent);animation:sb 3s infinite}
+@keyframes sb{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.sh{display:flex;justify-content:space-between;align-items:center;padding-bottom:22px;margin-bottom:26px;border-bottom:1px solid var(--b)}
+.ss{display:flex;align-items:center;gap:12px;font-family:var(--m);font-size:11px;letter-spacing:.22em;color:var(--cy);text-transform:uppercase}
+.sm{display:flex;gap:30px;font-family:var(--m);font-size:10px;letter-spacing:.18em;color:var(--d);text-transform:uppercase}
+.sm strong{color:var(--cy);font-weight:700}
+.cv{padding:12px 0;overflow:hidden}
+.cth{display:flex;gap:16px;transition:transform .9s cubic-bezier(.25,.8,.25,1)}
+.bk{flex:0 0 260px;padding:22px;background:linear-gradient(135deg,rgba(0,240,255,.05),rgba(139,92,246,.04));border:1px solid rgba(0,240,255,.28);font-family:var(--m);font-size:11px;position:relative;opacity:0;transform:translateX(60px) scale(.9);animation:bi .8s forwards}
+@keyframes bi{to{opacity:1;transform:translateX(0) scale(1)}}
+.bk::after{content:'→';position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--cy);font-size:15px}
+.bk:last-child::after{display:none}
+.bk.mine{border-color:var(--mg);box-shadow:0 0 50px rgba(255,0,212,.55)}
+.bh{display:flex;justify-content:space-between;color:var(--cy);font-size:9px;letter-spacing:.27em;margin-bottom:14px}
+.br{color:var(--wk);font-size:9px;margin-bottom:10px;letter-spacing:.12em;text-transform:uppercase}
+.br strong{color:var(--w);font-weight:400;display:block;letter-spacing:0;text-transform:none;font-size:10px;word-break:break-all;margin-top:3px;line-height:1.45}
+.br strong.hot{color:var(--cy)}.br strong.hl{color:var(--mg)}
+
+#tamper .st em{background:linear-gradient(180deg,var(--rd) 0%,var(--gd) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tw{background:rgba(5,8,19,.7);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid var(--b);padding:46px;position:relative}
+.tdc{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;margin-bottom:42px;padding-bottom:32px;border-bottom:1px solid var(--b)}
+.tdc p{font-size:14px;line-height:1.7;color:var(--d);max-width:620px}
+.tdc strong{color:var(--w);font-weight:500}
+.rb{font-family:var(--m);font-size:11px;letter-spacing:.28em;padding:14px 26px;background:transparent;border:1px solid var(--b);color:var(--d);cursor:none;text-transform:uppercase;transition:all .3s;white-space:nowrap}
+.rb:hover{border-color:var(--cy);color:var(--cy);box-shadow:0 0 25px rgba(0,240,255,.25)}
+.tch{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:32px}
+.tb{padding:22px 20px;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.32);font-family:var(--m);font-size:10px;position:relative;transition:all .5s}
+.tb.invalid{background:rgba(255,34,68,.1);border-color:var(--rd);animation:ts .45s}
+.tb.source{background:rgba(255,204,61,.1);border-color:var(--gd);box-shadow:0 0 35px rgba(255,204,61,.35)}
+@keyframes ts{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.tbh{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.24em;color:var(--gr);margin-bottom:14px}
+.tb.invalid .tbh{color:var(--rd)}.tb.source .tbh{color:var(--gd)}
+.tbs{font-weight:700}
+.tbl{color:var(--wk);font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:5px;margin-top:11px}
+.tbd{color:var(--w);font-size:11px;margin-bottom:6px;word-break:break-word}
+.tbhs{color:var(--d);font-size:9px;word-break:break-all;line-height:1.45}
+.tb.source .tbhs{color:var(--gd)}.tb.invalid .tbhs{color:var(--rd)}
+.tbe{width:100%;margin-top:7px;background:#000;border:1px solid var(--gd);color:var(--w);font-family:inherit;font-size:11px;padding:7px 9px;outline:none;display:none}
+.tb.source .tbe{display:block}
+.tcs{background:#000;border:1px solid var(--b);padding:22px;font-family:var(--m);font-size:11px;line-height:1.85;max-height:210px;overflow-y:auto;color:var(--d)}
+.tcl{margin-bottom:2px}.tcl.ok{color:var(--gr)}.tcl.err{color:var(--rd)}.tcl.warn{color:var(--gd)}
+.tcl .p{color:var(--vi);margin-right:7px}
+
+.mw{background:rgba(5,8,19,.7);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid var(--b);padding:50px;display:grid;grid-template-columns:1fr 1.2fr;gap:54px}
+.mp{font-family:var(--m)}
+.mpl{font-size:10px;letter-spacing:.32em;color:var(--d);margin-bottom:22px;text-transform:uppercase}
+.mpr{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px dashed var(--b);font-size:12px}
+.mpr>span:first-child{color:var(--d);letter-spacing:.1em;text-transform:uppercase;font-size:10px}
+.mpr>span:last-child{color:var(--cy);font-weight:600}
+.mpr:last-child{border-bottom:none}
+.ml{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px;padding:16px;background:#000;border:1px solid var(--b)}
+.mc{text-align:center}
+.mcl{font-size:9px;letter-spacing:.22em;color:var(--wk);text-transform:uppercase;margin-bottom:5px}
+.mv{font-size:17px;color:var(--cy);font-weight:700;font-variant-numeric:tabular-nums}
+.mv.mag{color:var(--mg)}.mv.gd{color:var(--gd)}
+.mb{width:100%;font-family:var(--dp);font-size:15px;font-weight:700;letter-spacing:.4em;padding:24px;background:transparent;color:var(--cy);border:1px solid var(--cy);cursor:none;text-transform:uppercase;margin-top:32px;position:relative;overflow:hidden;transition:all .3s}
+.mb:hover:not(:disabled){background:var(--cy);color:#000;box-shadow:0 0 60px rgba(0,240,255,.7)}
+.mb:disabled{opacity:.6;cursor:wait}
+.mb::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,240,255,.45),transparent);transform:translateX(-100%);transition:transform .8s}
+.mb:hover::before{transform:translateX(100%)}
+.mcs{background:#000;border:1px solid var(--b);padding:26px;font-family:var(--m);font-size:11px;line-height:1.8;height:450px;overflow-y:auto;color:var(--d)}
+.mcs::-webkit-scrollbar{width:4px}
+.mcs::-webkit-scrollbar-thumb{background:var(--cy)}
+.cl{margin-bottom:3px}
+.cl.ok{color:var(--gr)}.cl.info{color:var(--cy)}.cl.warn{color:var(--gd)}.cl.mag{color:var(--mg)}.cl.err{color:var(--rd)}
+.cl .p{color:var(--vi);margin-right:7px}
+
+#outro{min-height:100vh;text-align:center;flex-direction:column;justify-content:center}
+#outro .st{font-size:clamp(34px,4.8vw,64px);max-width:980px;margin:30px auto 44px}
+#outro .si{margin:0 auto 50px;text-align:center}
+.os{font-family:var(--m);font-size:10px;letter-spacing:.5em;color:var(--cy);text-transform:uppercase;margin-top:70px}
+
+#cli{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.96);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid var(--cy);box-shadow:0 -10px 50px rgba(0,240,255,.25);padding:22px 32px;z-index:2000;font-family:var(--m);transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+#cli.open{transform:translateY(0)}
+.ch{font-size:10px;letter-spacing:.32em;color:var(--wk);margin-bottom:11px;text-transform:uppercase;display:flex;justify-content:space-between}
+.ch span:last-child{color:var(--d)}
+.chist{max-height:190px;overflow-y:auto;margin-bottom:10px;font-size:12px;color:var(--d);line-height:1.85}
+.chist::-webkit-scrollbar{width:3px}.chist::-webkit-scrollbar-thumb{background:var(--vi)}
+.chist .echo{color:var(--w)}.chist .out{color:var(--cy)}.chist .err{color:var(--rd)}
+.ci{display:flex;align-items:center;gap:10px;font-size:13px}
+.cp{color:var(--mg);font-weight:600}
+.cin{flex:1;background:transparent;border:none;outline:none;color:var(--w);font-family:inherit;font-size:13px;caret-color:var(--cy)}
+
+footer{padding:80px 36px 40px;border-top:1px solid var(--b);background:rgba(2,3,8,.8);backdrop-filter:blur(22px);position:relative;z-index:10}
+.fi{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:50px}
+.ft{font-family:var(--dp);font-size:28px;font-weight:900;margin-bottom:22px;background:linear-gradient(180deg,#fff,var(--cy));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;letter-spacing:-.01em}
+.fd{font-size:13px;line-height:1.7;color:var(--d);max-width:400px}
+.fc h4{font-family:var(--m);font-size:10px;letter-spacing:.32em;color:var(--cy);margin-bottom:18px;text-transform:uppercase}
+.fc ul{list-style:none}
+.fc li{font-family:var(--m);font-size:11px;color:var(--d);margin-bottom:10px;transition:color .2s}
+.fc li:hover{color:var(--cy)}
+.fb{max-width:1280px;margin:50px auto 0;padding-top:32px;border-top:1px solid var(--b);display:flex;justify-content:space-between;font-family:var(--m);font-size:10px;letter-spacing:.22em;color:var(--wk);text-transform:uppercase}
+
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s,transform 1s}
+.rv.in{opacity:1;transform:translateY(0)}
+.shake{animation:sk .5s}
+@keyframes sk{0%,100%{transform:translate(0,0)}15%{transform:translate(-8px,3px)}30%{transform:translate(7px,-2px)}45%{transform:translate(-4px,4px)}60%{transform:translate(4px,-3px)}75%{transform:translate(-2px,1px)}}
+
+@media (max-width:900px){
+html,body{cursor:auto}
+.cursor,.cdot{display:none}
+.hud{padding:12px 14px;font-size:8px;flex-wrap:wrap;gap:8px}
+.hud>div{gap:10px}
+section{padding:100px 18px}
+#concept .gd{grid-template-columns:1fr;gap:50px}
+.dg{grid-template-columns:1fr}
+.tli{grid-template-columns:1fr;gap:25px}
+.tlt{display:none}
+.tch{grid-template-columns:1fr 1fr}
+.tdc{grid-template-columns:1fr;gap:20px}
+.mw{grid-template-columns:1fr;padding:30px;gap:30px}
+.fi{grid-template-columns:1fr 1fr;gap:30px}
+.fb{flex-direction:column;gap:10px}
+.rb,.mb,.hb{cursor:pointer}
+.dhint{display:none}}
+</style>
+</head>
+<body>
+
+<div id="boot">
+<div class="scan"></div><div class="crt"></div>
+<div class="boot-head"><span>TESSERACT OS // v3.0.1</span><span id="bootTime">--:--:--</span></div>
+<div id="bootLog"></div>
+</div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><span class="cp">tesseract@chain:~$</span><input class="cin" id="cin" autocomplete="off" spellcheck="false"></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>NET_ACTIVE</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<div class="dhint">▸ <strong>GLISSEZ</strong> POUR TOURNER // <strong>SHIFT</strong> POUR LA 4ᵉ DIMENSION</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section id="hero">
+<div class="inner">
+<div class="hk">// BLOCKCHAIN 3.0 // SIMULATION INTERACTIVE</div>
+<h1 class="ht" id="ht"></h1>
+<p class="hs">La troisième génération de blockchain n'ajoute pas une dimension —<br><em>elle en ajoute quatre.</em></p>
+</div>
+<div class="shint">DESCENDRE // 4ᵉ DIMENSION</div>
+</section>
+
+<section id="concept">
+<div class="inner">
+<div class="sl rv">CONCEPT // 001</div>
+<h2 class="st rv scr">Le cube qui <em>contient</em><br>un autre cube.</h2>
+<div class="gd">
+<div class="rv">
+<div class="qb">
+<div class="qt">Un tesseract est à un cube ce que <mark>Blockchain&nbsp;3.0</mark> est à ses ancêtres : l'enveloppe d'une réalité plus vaste.</div>
+<div class="qm">▸ AXIOME.001 — PROJECTION THÉORIQUE</div>
+</div>
+</div>
+<div class="ct rv">
+<p>La Blockchain 1.0 a créé la <strong>valeur numérique</strong>. La 2.0 a ajouté la <strong>logique programmable</strong>. La 3.0 les déplie dans un espace à quatre axes où chacun influence tous les autres.</p>
+<p>Scalabilité, interopérabilité, durabilité, applications réelles : les quatre dimensions d'un même hypercube. Quand l'un tourne, les trois autres bougent avec lui.</p>
+<div class="cn">// <em>Ce que vous voyez en arrière-plan</em> n'est pas un cube en rotation. C'est un <em>tesseract</em>, projeté depuis la 4D. <strong style="color:var(--cy)">Glissez-le avec la souris. Maintenez SHIFT pour faire tourner sa 4ᵉ dimension.</strong></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="dimensions">
+<div class="inner">
+<div class="sl rv">LES QUATRE AXES // 002</div>
+<h2 class="st rv scr">Quatre dimensions.<br><em>Une seule chaîne.</em></h2>
+<p class="si rv">Chaque sommet du tesseract connecte quatre arêtes — quatre piliers sur lesquels repose l'infrastructure de la Blockchain 3.0. Retirez-en un, et la structure entière s'effondre.</p>
+<div class="dg rv">
+<div class="dc" style="--c:#00f0ff" data-hover>
+<div class="dn">AXE_01 / X</div>
+<svg class="di" viewBox="0 0 60 60"><path d="M10 30 L30 10 L50 30 L30 50 Z"/><path d="M10 30 L50 30 M30 10 L30 50"/><circle cx="30" cy="30" r="3" fill="#00f0ff"/></svg>
+<h3 class="dt">SCALABILITÉ</h3>
+<p class="dd">Sharding, DAG (Directed Acyclic Graphs), consensus parallèles. Là où Bitcoin plafonnait à 7 transactions par seconde, la 3.0 vise le million — sans sacrifier la décentralisation.</p>
+<div class="ds"><span>TPS CIBLE</span><strong>&gt; 1 000 000</strong></div>
+</div>
+<div class="dc" style="--c:#ff00d4" data-hover>
+<div class="dn">AXE_02 / Y</div>
+<svg class="di" viewBox="0 0 60 60"><circle cx="20" cy="30" r="10"/><circle cx="40" cy="30" r="10"/><path d="M30 20 L30 40 M10 30 L50 30"/></svg>
+<h3 class="dt">INTEROPÉRABILITÉ</h3>
+<p class="dd">Les chaînes dialoguent. Ponts cryptographiques, protocoles IBC, communication inter-chaînes : la donnée et la valeur circulent librement entre écosystèmes autrefois isolés.</p>
+<div class="ds"><span>PROTOCOLES</span><strong>N × N</strong></div>
+</div>
+<div class="dc" style="--c:#8b5cf6" data-hover>
+<div class="dn">AXE_03 / Z</div>
+<svg class="di" viewBox="0 0 60 60"><path d="M30 5 L30 55"/><path d="M15 20 Q30 15 45 20 M15 35 Q30 30 45 35 M15 50 Q30 45 45 50"/><circle cx="30" cy="30" r="2.5" fill="#8b5cf6"/></svg>
+<h3 class="dt">DURABILITÉ</h3>
+<p class="dd">Fin du Proof-of-Work énergivore. Proof-of-Stake, Proof-of-Authority, consensus à faible empreinte. Une transaction 3.0 consomme moins qu'une recherche web.</p>
+<div class="ds"><span>ÉNERGIE vs 1.0</span><strong>−99,95%</strong></div>
+</div>
+<div class="dc" style="--c:#ffcc3d" data-hover>
+<div class="dn">AXE_04 / W</div>
+<svg class="di" viewBox="0 0 60 60"><rect x="10" y="15" width="40" height="30" rx="2"/><path d="M10 25 L50 25"/><circle cx="17" cy="20" r="1.5" fill="#ffcc3d"/><circle cx="22" cy="20" r="1.5" fill="#ffcc3d"/><path d="M20 35 L30 35 M20 40 L40 40"/></svg>
+<h3 class="dt">APPLICATIONS RÉELLES</h3>
+<p class="dd">Au-delà de la finance : santé (dossiers patients), logistique (traçabilité), vote (transparence), identité souveraine, tokenisation d'actifs. La 4ᵉ dimension, c'est l'usage.</p>
+<div class="ds"><span>SECTEURS</span><strong>15+ VERTICALES</strong></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="timeline">
+<div class="inner">
+<div class="sl rv">CHRONOLOGIE // 003</div>
+<h2 class="st rv scr">De la valeur à <em>l'écosystème</em>.</h2>
+<p class="si rv">Quinze années. Trois générations. Un basculement paradigmatique à chaque fois.</p>
+<div class="tl rv">
+<div class="tlt"></div>
+<div class="tli">
+<div class="tit" style="--tc:#8b5cf6" data-hover>
+<div class="tnd"></div>
+<div class="ty">2009 — LE COMMENCEMENT</div>
+<div class="tv">BLOCKCHAIN 1.0</div>
+<p class="td">Bitcoin. La preuve qu'un réseau peut s'accorder sur la vérité sans tiers de confiance. La blockchain, à ce stade, ne sait faire qu'une chose — mais elle la fait pour toujours.</p>
+<div class="tgs"><span class="tg">BITCOIN</span><span class="tg">PoW</span><span class="tg">VALEUR</span></div>
+</div>
+<div class="tit" style="--tc:#00f0ff" data-hover>
+<div class="tnd"></div>
+<div class="ty">2015 — LA PROGRAMMABILITÉ</div>
+<div class="tv">BLOCKCHAIN 2.0</div>
+<p class="td">Ethereum inaugure les smart contracts. La blockchain devient un ordinateur mondial. DApps, DeFi, NFT, DAO — l'explosion combinatoire du Turing-complet décentralisé.</p>
+<div class="tgs"><span class="tg">ETHEREUM</span><span class="tg">SMART</span><span class="tg">DAPPS</span></div>
+</div>
+<div class="tit" style="--tc:#ff00d4" data-hover>
+<div class="tnd"></div>
+<div class="ty">2020+ — LA MATURITÉ</div>
+<div class="tv">BLOCKCHAIN 3.0</div>
+<p class="td">Polkadot, Cosmos, Solana, Avalanche. Interconnexion, scaling, durabilité, usages non-financiers. La blockchain cesse d'être une technologie : elle devient une infrastructure.</p>
+<div class="tgs"><span class="tg">INTEROP</span><span class="tg">DAG</span><span class="tg">PoS</span><span class="tg">IoT</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="simulation">
+<div class="inner">
+<div class="sl rv">FLUX TEMPS RÉEL // 004</div>
+<h2 class="st rv scr">La chaîne vit.<br><em>En ce moment.</em></h2>
+<p class="si rv">Le réseau génère des blocs en continu avec des <strong>hashs SHA-256 réels</strong>. Chaque nouveau bloc illumine un sommet spécifique du tesseract — <strong>la chaîne EST le tesseract</strong>.</p>
+<div class="sw rv">
+<div class="sh">
+<div class="ss"><div class="hd"></div><span>RÉSEAU EN LIGNE // VALIDATION AUTOMATIQUE</span></div>
+<div class="sm"><span>BLOCKS <strong id="sbk">0</strong></span><span>TX <strong id="stx">0</strong></span><span>HASH/s <strong id="srt">0</strong></span></div>
+</div>
+<div class="cv"><div class="cth" id="cth"></div></div>
+</div>
+</div>
+</section>
+
+<section id="tamper">
+<div class="inner">
+<div class="sl rv">TEST D'INTÉGRITÉ // 005</div>
+<h2 class="st rv scr">Modifiez un bloc.<br><em>Regardez la chaîne se briser.</em></h2>
+<p class="si rv">Chaque bloc contient le hash du précédent. Altérez une donnée, son hash change — tous les blocs suivants deviennent invalides. <strong style="color:var(--rd)">Avertissement : le tesseract va réagir.</strong></p>
+<div class="tw rv">
+<div class="tdc">
+<p><strong>Modifiez le montant du bloc #001</strong> (input jaune) — observez la cascade d'invalidation en temps réel. Le réseau rejetterait cette chaîne en &lt;50ms.</p>
+<button class="rb" id="resetT" data-hover>↻ RÉINITIALISER</button>
+</div>
+<div class="tch" id="tch"></div>
+<div class="tcs" id="tcs"></div>
+</div>
+</div>
+</section>
+
+<section id="mining">
+<div class="inner">
+<div class="sl rv">PROOF OF WORK // 006</div>
+<h2 class="st rv scr">Minez votre <em>propre bloc</em>.</h2>
+<p class="si rv">Cliquez — votre CPU va <strong>réellement calculer des hashes SHA-256</strong> jusqu'à trouver un nonce produisant un hash en 0000. Une loterie à 1 sur 65 536.</p>
+<div class="mw rv">
+<div class="mp">
+<div class="mpl">▸ Paramètres</div>
+<div class="mpr"><span>Difficulté</span><span>0000 × 65 536</span></div>
+<div class="mpr"><span>Algorithme</span><span>SHA-256</span></div>
+<div class="mpr"><span>Récompense</span><span>6,25 TSC</span></div>
+<div class="mpr"><span>Mineur_ID</span><span id="mid" style="color:var(--mg)">0x---</span></div>
+<div class="ml">
+<div class="mc"><div class="mcl">Nonce</div><div class="mv" id="lvn">0</div></div>
+<div class="mc"><div class="mcl">Hash/s</div><div class="mv mag" id="lvr">0</div></div>
+<div class="mc"><div class="mcl">Temps</div><div class="mv gd" id="lvt">0.0s</div></div>
+</div>
+<button class="mb" id="mbtn" data-hover>⧫ LANCER LE MINAGE</button>
+</div>
+<div class="mcs" id="mcs">
+<div class="cl"><span class="p">&gt;</span>tesseract.chain v3.0.1 // Web Crypto API prête</div>
+<div class="cl"><span class="p">&gt;</span>algorithme SHA-256 chargé</div>
+<div class="cl" style="opacity:.5"><span class="p">&gt;</span>// cliquez sur [LANCER LE MINAGE]</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="outro">
+<div class="inner">
+<div class="sl rv" style="justify-content:center">EPILOG // ∞</div>
+<h2 class="st rv scr">Ce que vous avez vu n'est qu'<em>une projection</em>.<br>La vraie chaîne se passe ailleurs.</h2>
+<p class="si rv">Blockchain 3.0 n'est pas une destination — c'est un basculement. Ce site est une projection. Le réseau réel, lui, tourne en ce moment dans une dimension que vous ne voyez pas.</p>
+<div class="os rv">◆ FIN DE LA SIMULATION ◆</div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Exploration pédagogique et interactive de la blockchain de troisième génération via l'hypercube 4D. Minage réel (Web Crypto API), post-processing WebGL, audio génératif (Tone.js).</p>
+</div>
+<div class="fc"><h4>Concepts</h4><ul><li>▸ DAG Architecture</li><li>▸ Proof of Stake</li><li>▸ Cross-chain</li><li>▸ Sharding</li><li>▸ Zero-knowledge</li></ul></div>
+<div class="fc"><h4>Écosystème</h4><ul><li>▸ Polkadot</li><li>▸ Cosmos / IBC</li><li>▸ Solana</li><li>▸ Avalanche</li><li>▸ Algorand</li></ul></div>
+<div class="fc"><h4>Contrôles</h4><ul><li>▸ DRAG : rotation</li><li>▸ SHIFT : axe W</li><li>▸ ² : CLI</li><li>▸ help dans CLI</li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN // SIMULATION</span><span id="fcrd">X:0 Y:0 Z:0 W:0</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const lerp=(a,b,t)=>a+(b-a)*t;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ss=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
+
+// ═══ CURSOR ═══
+const cursor=$('cursor'),cdot=$('cdot');
+let cx=0,cy=0,tx=0,ty=0;
+addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;cdot.style.left=tx+'px';cdot.style.top=ty+'px'});
+addEventListener('mousedown',()=>cursor.classList.add('click'));
+addEventListener('mouseup',()=>cursor.classList.remove('click'));
+(function cl(){cx+=(tx-cx)*.2;cy+=(ty-cy)*.2;cursor.style.left=cx+'px';cursor.style.top=cy+'px';requestAnimationFrame(cl)})();
+
+// ═══ AUDIO (Tone.js) — auto-start on first gesture ═══
+let aR=false,aE=true;
+let drone,dF,mG,shm,hvS,clS,dpS,nsS,chS;
+const aBtn=$('audioBtn');
+
+async function bootAudio(){
+  if(aR)return;
+  if(typeof Tone==='undefined'){console.warn('Tone unavailable');return}
+  try{
+    await Tone.start();
+    mG=new Tone.Gain(.5).toDestination();
+    const rv=new Tone.Reverb({decay:10,wet:.55}).connect(mG);
+    dF=new Tone.Filter(600,'lowpass',-24).connect(rv);
+    drone=new Tone.FMSynth({harmonicity:1.005,modulationIndex:3,envelope:{attack:6,release:6,sustain:1},oscillator:{type:'sine'},volume:-14}).connect(dF);
+    shm=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'sine'},envelope:{attack:3,decay:2,sustain:.5,release:5},volume:-26}).connect(rv);
+    hvS=new Tone.Synth({oscillator:{type:'triangle'},envelope:{attack:.001,decay:.12,sustain:0,release:.15},volume:-24}).connect(rv);
+    clS=new Tone.Synth({oscillator:{type:'square'},envelope:{attack:.001,decay:.04,sustain:0,release:.04},volume:-22}).connect(mG);
+    dpS=new Tone.MembraneSynth({octaves:8,pitchDecay:.04,envelope:{attack:.001,decay:.5,sustain:0,release:.5},volume:-4}).connect(mG);
+    nsS=new Tone.NoiseSynth({noise:{type:'brown'},envelope:{attack:.001,decay:1.2,sustain:0},volume:-10}).connect(rv);
+    chS=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'triangle'},envelope:{attack:.03,decay:.5,sustain:.4,release:1.5},volume:-14}).connect(rv);
+    drone.triggerAttack('C2');
+    const notes=['C5','E5','G5','B5','D6','F#5'];
+    setInterval(()=>{if(!aE)return;shm.triggerAttackRelease(notes[Math.floor(Math.random()*notes.length)],'1.5n')},5500);
+    let fp=0;
+    setInterval(()=>{fp+=.012;dF.frequency.rampTo(400+Math.sin(fp)*220,.5)},200);
+    aR=true;aE=true;
+    aBtn.classList.add('active');aBtn.textContent='♪ AUDIO ON';
+  }catch(e){console.warn('audio fail',e);aBtn.textContent='♪ AUDIO N/A';aBtn.disabled=true}
+}
+function tAudio(){if(!aR){bootAudio();return}aE=!aE;mG.gain.rampTo(aE?.5:0,.3);aBtn.classList.toggle('active',aE);aBtn.textContent=aE?'♪ AUDIO ON':'♪ AUDIO'}
+aBtn.addEventListener('click',tAudio);
+function fg(){if(!aR)bootAudio()}
+addEventListener('click',fg);addEventListener('keydown',fg);
+
+function sHov(p='E5'){if(!aR||!aE)return;try{hvS.triggerAttackRelease(p,'32n')}catch(e){}}
+function sClk(){if(!aR||!aE)return;try{clS.triggerAttackRelease('C6','64n')}catch(e){}}
+function sBlk(){if(!aR||!aE)return;try{dpS.triggerAttackRelease('G1','16n')}catch(e){}}
+function sWin(){if(!aR||!aE)return;try{dpS.triggerAttackRelease('C1','8n');setTimeout(()=>chS.triggerAttackRelease(['C4','E4','G4','B4','D5'],'2n'),80)}catch(e){}}
+function sTmp(){if(!aR||!aE)return;try{nsS.triggerAttackRelease('2n');chS.triggerAttackRelease(['C#3','D3','F#3','G3'],'4n')}catch(e){}}
+function sMh(){if(!aR||!aE)return;try{clS.triggerAttackRelease('G3','64n')}catch(e){}}
+
+// ═══ UNIVERSAL HOVER/CLICK AUDIO ═══
+document.addEventListener('mouseover',e=>{
+  const el=e.target.closest('button, a, input, [data-hover], .dc, .tit');
+  if(el){
+    cursor.classList.add('hov');
+    let p='E5';
+    if(el.matches('.dc'))p='G5';
+    else if(el.matches('.tit'))p='A5';
+    else if(el.matches('.mb'))p='C5';
+    else if(el.matches('.rb'))p='F5';
+    else if(el.matches('input'))p='B5';
+    sHov(p);
+  }
+});
+document.addEventListener('mouseout',e=>{
+  const el=e.target.closest('button, a, input, [data-hover], .dc, .tit');
+  if(el)cursor.classList.remove('hov');
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('button, a, .dc, .tit, [data-hover]'))sClk();
+});
+
+// ═══ HUD ═══
+setInterval(()=>{
+  const d=new Date();
+  const hms=[d.getUTCHours(),d.getUTCMinutes(),d.getUTCSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+  $('htime').textContent=hms+' UTC';
+  const bt=$('bootTime');if(bt)bt.textContent=hms;
+},1000);
+setInterval(()=>{
+  $('htps').textContent=(12000+Math.floor(Math.random()*3000)).toLocaleString('fr-FR');
+  $('hn').textContent=248+Math.floor(Math.random()*16);
+},1600);
+
+// ═══ BOOT ═══
+const bootLog=$('bootLog');
+const ascii=`       ┌──────┐
+      ╱│     ╱│
+     ╱ │    ╱ │
+    ┌──┼───┐  │
+    │  └───┼──┘
+    │ ╱    │ ╱
+    │╱     │╱
+    └──────┘`;
+const bL=[
+{t:100,text:'tesseract.chain // cold boot'},{t:200,text:''},
+{t:100,text:'[BOOT] Loading kernel...',cls:'head'},
+{t:100,text:'    [OK] WebGL2 context acquired',cls:'ok'},
+{t:100,text:'    [OK] Shader pipeline compiled',cls:'ok'},
+{t:100,text:'    [OK] 4D projection matrices loaded',cls:'ok'},
+{t:100,text:'    [OK] Post-processing (bloom + aberration)',cls:'ok'},
+{t:100,text:'    [OK] SHA-256 hardware acceleration detected',cls:'ok'},
+{t:180,text:''},
+{t:100,text:'[AUDIO] Synthesis engine...',cls:'head'},
+{t:100,text:'    [OK] FM drone + reverb chain ready',cls:'info'},
+{t:180,text:''},
+{t:100,text:'[NET] Connecting to mesh...',cls:'head'},
+{t:120,text:'    nodes[000:064] ............. ONLINE',cls:'info'},
+{t:110,text:'    nodes[064:128] ............. ONLINE',cls:'info'},
+{t:110,text:'    nodes[128:192] ............. ONLINE',cls:'info'},
+{t:110,text:'    nodes[192:256] ............. ONLINE',cls:'info'},
+{t:180,text:''},
+{t:100,text:'[SYNC] Last block: #8,427,991'},
+{t:100,text:'[SYNC] Consensus: validated across 256/256 nodes'},
+{t:200,text:''},
+{t:100,text:ascii,cls:'ascii'},
+{t:380,text:''},
+{t:100,text:'▸ TESSERACT ONLINE. All systems nominal.',cls:'warn'}];
+
+async function runBoot(){
+  for(const l of bL){
+    await new Promise(r=>setTimeout(r,l.t));
+    const d=document.createElement('div');
+    if(l.cls==='ascii'){d.className='bl ascii';d.textContent=l.text}
+    else{d.className='bl'+(l.cls?' '+l.cls:'');d.textContent=l.text||'\u00A0'}
+    bootLog.appendChild(d);
+  }
+  await new Promise(r=>setTimeout(r,400));
+  const p=document.createElement('div');
+  p.className='bp ready';
+  p.innerHTML='&gt;&nbsp;&nbsp;Appuyez sur <span class="key">ENTRÉE</span> pour entrer dans la 4ᵉ dimension';
+  bootLog.appendChild(p);
+  await new Promise(r=>{
+    const h=e=>{if(e.key==='Enter'||e.key===' '||e.type==='click'){removeEventListener('keydown',h);removeEventListener('click',h);r()}};
+    addEventListener('keydown',h);addEventListener('click',h);
+  });
+  const fl=$('flash');fl.classList.add('on');$('boot').classList.add('flash');
+  bootAudio();
+  setTimeout(()=>fl.classList.remove('on'),160);
+  setTimeout(()=>{$('boot').classList.add('gone');$('boot').classList.remove('flash')},240);
+  revealHero();
+}
+function revealHero(){
+  const title='TESSERACT\nCHAIN';
+  const el=$('ht');el.innerHTML='';
+  const letters=[];
+  title.split('').forEach(ch=>{
+    if(ch==='\n'){el.appendChild(document.createElement('br'));return}
+    const s=document.createElement('span');s.textContent=ch;el.appendChild(s);letters.push(s);
+  });
+  letters.forEach((s,i)=>{s.style.animationDelay=(.2+i*.05)+'s'});
+}
+
+// ═══ THREE.JS ═══
+const canvas=$('bgCanvas');
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x02030a,.04);
+const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,100);
+camera.position.set(0,0,7);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.autoClear=true;
+renderer.setClearColor(0x000000,1);
+
+// 4D data
+const v4=[];
+for(let i=0;i<16;i++)v4.push([(i&1)?1:-1,(i&2)?1:-1,(i&4)?1:-1,(i&8)?1:-1]);
+const edges=[];
+for(let i=0;i<16;i++)for(let j=i+1;j<16;j++){const d=i^j;if((d&(d-1))===0)edges.push([i,j])}
+
+function rot4(v,aXW,aYZ,aXY,aZW){
+  let [x,y,z,w]=v,c,s,n1,n2;
+  c=Math.cos(aXW);s=Math.sin(aXW);n1=x*c-w*s;n2=x*s+w*c;x=n1;w=n2;
+  c=Math.cos(aYZ);s=Math.sin(aYZ);n1=y*c-z*s;n2=y*s+z*c;y=n1;z=n2;
+  c=Math.cos(aXY);s=Math.sin(aXY);n1=x*c-y*s;n2=x*s+y*c;x=n1;y=n2;
+  c=Math.cos(aZW);s=Math.sin(aZW);n1=z*c-w*s;n2=z*s+w*c;z=n1;w=n2;
+  return [x,y,z,w];
+}
+function proj(v,d=2.8){const k=1/(d-v[3]);return [v[0]*k*d,v[1]*k*d,v[2]*k*d]}
+
+function bLines(op,sc){
+  const g=new THREE.BufferGeometry();
+  const p=new Float32Array(edges.length*6);
+  const c=new Float32Array(edges.length*6);
+  g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  g.setAttribute('color',new THREE.BufferAttribute(c,3));
+  const m=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false});
+  const l=new THREE.LineSegments(g,m);l.scale.setScalar(sc);return l;
+}
+const mTess=new THREE.Group();
+const layers=[bLines(1,1),bLines(.35,1.04),bLines(.16,1.1),bLines(.07,1.2)];
+layers.forEach(l=>mTess.add(l));
+scene.add(mTess);
+
+function mkTex(st){
+  const c=document.createElement('canvas');c.width=c.height=128;
+  const g=c.getContext('2d');
+  const gr=g.createRadialGradient(64,64,0,64,64,64);
+  st.forEach(([p,col])=>gr.addColorStop(p,col));
+  g.fillStyle=gr;g.fillRect(0,0,128,128);
+  return new THREE.CanvasTexture(c);
+}
+const nTex=mkTex([[0,'rgba(255,255,255,1)'],[.12,'rgba(0,240,255,1)'],[.35,'rgba(139,92,246,.55)'],[1,'rgba(0,0,0,0)']]);
+const pTex=mkTex([[0,'rgba(255,255,255,1)'],[.18,'rgba(255,0,212,1)'],[.48,'rgba(255,0,212,.35)'],[1,'rgba(0,0,0,0)']]);
+const sTex=mkTex([[0,'rgba(255,255,255,1)'],[.4,'rgba(255,255,255,.3)'],[1,'rgba(255,255,255,0)']]);
+const rTex=mkTex([[0,'rgba(255,255,255,1)'],[.18,'rgba(255,34,68,1)'],[.48,'rgba(255,34,68,.35)'],[1,'rgba(0,0,0,0)']]);
+
+const vSpr=[];
+for(let i=0;i<16;i++){
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:nTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:.9}));
+  s.scale.setScalar(.3);
+  s.userData={bs:.3,pls:0,rpls:0};
+  mTess.add(s);vSpr.push(s);
+}
+
+class Pulse{
+  constructor(){
+    this.spr=new THREE.Sprite(new THREE.SpriteMaterial({map:Math.random()<.4?pTex:nTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0}));
+    this.spr.scale.setScalar(.2+Math.random()*.12);
+    this.reset(true);
+  }
+  reset(i){
+    this.ei=Math.floor(Math.random()*edges.length);
+    this.pr=i?Math.random():0;
+    this.sp=.18+Math.random()*.55;
+    this.lf=i?Math.random()*2:0;
+    this.ml=1.5+Math.random()*2.2;
+  }
+  update(dt,pj){
+    this.pr+=this.sp*dt;this.lf+=dt;
+    if(this.pr>=1||this.lf>=this.ml)this.reset(false);
+    const [a,b]=edges[this.ei];const p1=pj[a],p2=pj[b];
+    this.spr.position.set(p1[0]+(p2[0]-p1[0])*this.pr,p1[1]+(p2[1]-p1[1])*this.pr,p1[2]+(p2[2]-p1[2])*this.pr);
+    const t=this.lf/this.ml;
+    this.spr.material.opacity=Math.sin(Math.PI*t)*.95;
+  }
+}
+const pulses=Array.from({length:44},()=>new Pulse());
+pulses.forEach(p=>mTess.add(p.spr));
+
+// Satellite tesseracts for outro
+const sats=[];
+for(let s=0;s<6;s++){
+  const grp=new THREE.Group();
+  const g=new THREE.BufferGeometry();
+  const p=new Float32Array(edges.length*6);
+  const c=new Float32Array(edges.length*6);
+  g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  g.setAttribute('color',new THREE.BufferAttribute(c,3));
+  const m=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+  const ln=new THREE.LineSegments(g,m);grp.add(ln);
+  const a=(s/6)*Math.PI*2;const ds=14+Math.random()*5;
+  grp.position.set(Math.cos(a)*ds,(Math.random()-.5)*7,Math.sin(a)*ds);
+  grp.scale.setScalar(.6+Math.random()*.35);
+  grp.userData={ln,m,ph:Math.random()*1000};
+  scene.add(grp);sats.push(grp);
+}
+
+// Stars
+const sG=new THREE.BufferGeometry();
+const sP=new Float32Array(1500*3),sC=new Float32Array(1500*3);
+const cA=new THREE.Color(0x00f0ff),cB=new THREE.Color(0xff00d4),cC=new THREE.Color(0x8b5cf6);
+for(let i=0;i<1500;i++){
+  const r=10+Math.random()*40;const th=Math.random()*Math.PI*2;const ph=Math.acos(2*Math.random()-1);
+  sP[i*3]=r*Math.sin(ph)*Math.cos(th);sP[i*3+1]=r*Math.sin(ph)*Math.sin(th);sP[i*3+2]=r*Math.cos(ph);
+  const rn=Math.random();const c=rn<.55?cA:(rn<.8?cB:cC);
+  sC[i*3]=c.r;sC[i*3+1]=c.g;sC[i*3+2]=c.b;
+}
+sG.setAttribute('position',new THREE.BufferAttribute(sP,3));
+sG.setAttribute('color',new THREE.BufferAttribute(sC,3));
+const stars=new THREE.Points(sG,new THREE.PointsMaterial({size:.11,map:sTex,vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true}));
+scene.add(stars);
+
+// ═══ POST-PROCESSING ═══
+const vs=`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position,1.);}`;
+const sRT=new THREE.WebGLRenderTarget(innerWidth,innerHeight,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
+const hw=Math.max(256,Math.floor(innerWidth/2));
+const hh=Math.max(256,Math.floor(innerHeight/2));
+const bRT=new THREE.WebGLRenderTarget(hw,hh);
+const h1=new THREE.WebGLRenderTarget(hw,hh);
+const h2=new THREE.WebGLRenderTarget(hw,hh);
+
+const pScn=new THREE.Scene();
+const pCm=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+const pQd=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.MeshBasicMaterial());
+pScn.add(pQd);
+
+const thM=new THREE.ShaderMaterial({
+  uniforms:{tD:{value:null}},vertexShader:vs,
+  fragmentShader:`uniform sampler2D tD;varying vec2 vUv;void main(){vec3 c=texture2D(tD,vUv).rgb;float b=max(c.r,max(c.g,c.b));gl_FragColor=vec4(c*smoothstep(.55,1.,b),1.);}`
+});
+const blM=new THREE.ShaderMaterial({
+  uniforms:{tD:{value:null},uDr:{value:new THREE.Vector2(1,0)},uR:{value:new THREE.Vector2(hw,hh)}},
+  vertexShader:vs,
+  fragmentShader:`uniform sampler2D tD;uniform vec2 uDr;uniform vec2 uR;varying vec2 vUv;
+  void main(){vec2 t=1./uR;vec4 s=vec4(0.);float w[9];w[0]=.05;w[1]=.09;w[2]=.12;w[3]=.15;w[4]=.18;w[5]=.15;w[6]=.12;w[7]=.09;w[8]=.05;
+  for(int i=0;i<9;i++){vec2 o=uDr*t*float(i-4)*2.5;s+=texture2D(tD,vUv+o)*w[i];}gl_FragColor=s;}`
+});
+const cmM=new THREE.ShaderMaterial({
+  uniforms:{tS:{value:null},tB:{value:null},uT:{value:0},uAb:{value:.005},uBl:{value:1.4},uRd:{value:0}},
+  vertexShader:vs,
+  fragmentShader:`uniform sampler2D tS;uniform sampler2D tB;uniform float uT;uniform float uAb;uniform float uBl;uniform float uRd;varying vec2 vUv;
+  float rnd(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+  void main(){
+    vec2 uv=vUv;vec2 ct=vec2(.5);vec2 dr=uv-ct;float ds=length(dr);
+    vec3 bg=mix(vec3(.005,.012,.04),vec3(.09,.045,.17),uv.y);
+    bg+=vec3(.54,.36,.96)*smoothstep(.85,.3,length(uv-vec2(.5,1.1)))*.25;
+    bg+=vec3(0.,.94,1.)*smoothstep(.7,.2,length(uv-vec2(.5,-.1)))*.12;
+    float am=uAb*(1.+ds*1.8);
+    float r=texture2D(tS,uv-dr*am).r;float g=texture2D(tS,uv).g;float b=texture2D(tS,uv+dr*am).b;
+    vec3 sc=vec3(r,g,b);
+    vec3 bl=texture2D(tB,uv).rgb*uBl;
+    vec3 col=bg+sc+bl;
+    if(uRd>.01){vec3 rt=vec3(1.,.2,.3);col=mix(col,col*rt+vec3(.15,0.,.02),uRd);}
+    col*=mix(.25,1.,smoothstep(1.3,.3,ds));
+    col+=(rnd(uv*1800.+uT)-.5)*.055;
+    col=col/(col+vec3(.5))*1.5;
+    gl_FragColor=vec4(col,1.);
+  }`
+});
+
+function renderPost(t){
+  renderer.setRenderTarget(sRT);renderer.clear();renderer.render(scene,camera);
+  pQd.material=thM;thM.uniforms.tD.value=sRT.texture;
+  renderer.setRenderTarget(bRT);renderer.clear();renderer.render(pScn,pCm);
+  pQd.material=blM;
+  blM.uniforms.tD.value=bRT.texture;blM.uniforms.uDr.value.set(1,0);
+  renderer.setRenderTarget(h1);renderer.clear();renderer.render(pScn,pCm);
+  blM.uniforms.tD.value=h1.texture;blM.uniforms.uDr.value.set(0,1);
+  renderer.setRenderTarget(h2);renderer.clear();renderer.render(pScn,pCm);
+  blM.uniforms.tD.value=h2.texture;blM.uniforms.uDr.value.set(1,0);
+  renderer.setRenderTarget(h1);renderer.clear();renderer.render(pScn,pCm);
+  blM.uniforms.tD.value=h1.texture;blM.uniforms.uDr.value.set(0,1);
+  renderer.setRenderTarget(h2);renderer.clear();renderer.render(pScn,pCm);
+  pQd.material=cmM;
+  cmM.uniforms.tS.value=sRT.texture;cmM.uniforms.tB.value=h2.texture;cmM.uniforms.uT.value=t;
+  renderer.setRenderTarget(null);renderer.clear();renderer.render(pScn,pCm);
+}
+
+// ═══ INTERACTION ═══
+let dragY=0,dragX=0,dragW=0,vdX=0,vdY=0,vdW=0;
+let isDr=false,shH=false,lMx=0,lMy=0;
+
+function onInt(t){return t&&t.closest&&t.closest('button, a, input, .dc, .tit, .tb, .tbe, #cli, .hb')}
+
+addEventListener('mousedown',e=>{
+  if(onInt(e.target))return;
+  isDr=true;lMx=e.clientX;lMy=e.clientY;
+  cursor.classList.add('drag');
+});
+addEventListener('mouseup',()=>{isDr=false;cursor.classList.remove('drag')});
+addEventListener('mousemove',e=>{
+  if(!isDr)return;
+  const dx=e.clientX-lMx,dy=e.clientY-lMy;
+  lMx=e.clientX;lMy=e.clientY;
+  if(shH)vdW+=dx*.005;
+  else{vdY+=dx*.005;vdX+=dy*.005}
+});
+addEventListener('keydown',e=>{if(e.key==='Shift')shH=true});
+addEventListener('keyup',e=>{if(e.key==='Shift')shH=false});
+
+// Scroll
+let sy=0,sp=0;
+addEventListener('scroll',()=>{sy=scrollY;sp=clamp(sy/(document.body.scrollHeight-innerHeight),0,1)});
+let tmx=0,tmy=0,mx=0,my=0;
+addEventListener('mousemove',e=>{tmx=(e.clientX/innerWidth-.5)*2;tmy=(e.clientY/innerHeight-.5)*2});
+
+// Camera keys
+const cK=[
+{p:[0,0,7],l:[0,0,0]},
+{p:[-1.8,.5,5.2],l:[0,0,0]},
+{p:[0,0,2.8],l:[0,0,0]},
+{p:[2.5,.3,5.5],l:[0,0,0]},
+{p:[0,-.8,3.8],l:[0,0,0]},
+{p:[-1,-1.5,3.3],l:[0,0,0]},
+{p:[1.5,1,4.5],l:[0,0,0]},
+{p:[0,6,18],l:[0,0,0]}];
+function gK(p){
+  const n=cK.length-1;const idx=clamp(Math.floor(p*n),0,n-1);
+  const t=p*n-idx;const a=cK[idx],b=cK[idx+1];const tt=t*t*(3-2*t);
+  return {p:[lerp(a.p[0],b.p[0],tt),lerp(a.p[1],b.p[1],tt),lerp(a.p[2],b.p[2],tt)],l:[lerp(a.l[0],b.l[0],tt),lerp(a.l[1],b.l[1],tt),lerp(a.l[2],b.l[2],tt)]};
+}
+
+// Tesseract state
+let tPls=0,rMd=0,gMd=0;
+function pTs(){tPls=1}
+function sRM(v){rMd=v}
+function shake(){document.body.classList.add('shake');setTimeout(()=>document.body.classList.remove('shake'),500)}
+function pVx(idx,red){
+  if(idx<0||idx>=vSpr.length)return;
+  const s=vSpr[idx];
+  if(red){s.material.map=rTex;s.userData.rpls=1}
+  else{s.material.map=nTex;s.userData.pls=1}
+}
+
+// ═══ LOOP ═══
+let t0=performance.now();
+function frame(){
+  const n=performance.now(),t=(n-t0)*.001,dt=.016;
+  mx+=(tmx-mx)*.04;my+=(tmy-my)*.04;
+  dragX+=vdX;dragY+=vdY;dragW+=vdW;
+  vdX*=.92;vdY*=.92;vdW*=.92;
+
+  const aXW=t*.22+dragW,aYZ=t*.36-dragX*.4,aXY=t*.16+dragY,aZW=t*.2;
+  const pj=v4.map(v=>proj(rot4(v,aXW,aYZ,aXY,aZW)));
+
+  layers.forEach((L,li)=>{
+    const pos=L.geometry.attributes.position.array;
+    const col=L.geometry.attributes.color.array;
+    edges.forEach((e,i)=>{
+      const [a,b]=e;const p1=pj[a],p2=pj[b];const o=i*6;
+      pos[o]=p1[0];pos[o+1]=p1[1];pos[o+2]=p1[2];
+      pos[o+3]=p2[0];pos[o+4]=p2[1];pos[o+5]=p2[2];
+      const ph=(i/edges.length+t*.08+li*.1)%1;
+      let c1;
+      if(rMd>.02)c1=new THREE.Color(0xff3355).lerp(new THREE.Color(0xffcc3d),ph);
+      else if(gMd>.02)c1=new THREE.Color(0xffcc3d).lerp(new THREE.Color(0x00f0ff),ph);
+      else c1=ph<.5?cA.clone().lerp(cC,ph*2):cC.clone().lerp(cB,(ph-.5)*2);
+      col[o]=c1.r;col[o+1]=c1.g;col[o+2]=c1.b;
+      col[o+3]=c1.r;col[o+4]=c1.g;col[o+5]=c1.b;
+    });
+    L.geometry.attributes.position.needsUpdate=true;
+    L.geometry.attributes.color.needsUpdate=true;
+  });
+
+  vSpr.forEach((s,i)=>{
+    s.position.set(pj[i][0],pj[i][1],pj[i][2]);
+    s.userData.pls*=.92;s.userData.rpls*=.94;
+    s.scale.setScalar(s.userData.bs*(1+s.userData.pls*1.5+s.userData.rpls*2));
+    s.material.opacity=.85+s.userData.pls*.5+s.userData.rpls*.5;
+    if(s.userData.rpls<.02&&s.material.map===rTex)s.material.map=nTex;
+  });
+
+  pulses.forEach(p=>p.update(dt,pj));
+
+  tPls*=.93;
+  const ps=1+tPls*.18;
+  layers.forEach((l,i)=>l.scale.setScalar(ps*(1+i*.03)));
+
+  // Satellites
+  const sVis=ss(.78,.97,sp);
+  sats.forEach((g,si)=>{
+    const ln=g.userData.ln,m=g.userData.m,ph=g.userData.ph;
+    m.opacity=.35*sVis;
+    const sp2=v4.map(v=>proj(rot4(v,t*.15+ph,t*.2+ph,t*.1+ph,t*.17+ph)));
+    const pos=ln.geometry.attributes.position.array;
+    const col=ln.geometry.attributes.color.array;
+    edges.forEach((e,i)=>{
+      const [a,b]=e;const p1=sp2[a],p2=sp2[b];const o=i*6;
+      pos[o]=p1[0];pos[o+1]=p1[1];pos[o+2]=p1[2];
+      pos[o+3]=p2[0];pos[o+4]=p2[1];pos[o+5]=p2[2];
+      const c=cA.clone().lerp(cC,(i/edges.length+t*.1)%1);
+      col[o]=c.r;col[o+1]=c.g;col[o+2]=c.b;
+      col[o+3]=c.r;col[o+4]=c.g;col[o+5]=c.b;
+    });
+    ln.geometry.attributes.position.needsUpdate=true;
+    ln.geometry.attributes.color.needsUpdate=true;
+    g.rotation.y+=.002;g.rotation.x+=.0012;
+  });
+
+  rMd*=.97;gMd*=.97;
+
+  const cm=gK(sp);
+  camera.position.x=lerp(camera.position.x,cm.p[0]+mx*.35,.05);
+  camera.position.y=lerp(camera.position.y,cm.p[1]-my*.2,.05);
+  camera.position.z=lerp(camera.position.z,cm.p[2],.05);
+  camera.lookAt(cm.l[0],cm.l[1],cm.l[2]);
+
+  stars.rotation.y+=.0005;stars.rotation.x+=.0002;
+
+  cmM.uniforms.uRd.value=rMd;
+  cmM.uniforms.uAb.value=.004+rMd*.008+tPls*.005;
+  cmM.uniforms.uBl.value=1.35+tPls*.4;
+
+  renderPost(t);
+
+  const r0=rot4(v4[0],aXW,aYZ,aXY,aZW);
+  const fc=$('fcrd');
+  if(fc)fc.textContent=`X:${r0[0].toFixed(2)} Y:${r0[1].toFixed(2)} Z:${r0[2].toFixed(2)} W:${r0[3].toFixed(2)}`;
+
+  requestAnimationFrame(frame);
+}
+frame();
+
+addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+  sRT.setSize(innerWidth,innerHeight);
+  const nw=Math.max(256,Math.floor(innerWidth/2)),nh=Math.max(256,Math.floor(innerHeight/2));
+  bRT.setSize(nw,nh);h1.setSize(nw,nh);h2.setSize(nw,nh);
+  blM.uniforms.uR.value.set(nw,nh);
+});
+
+// ═══ SHA-256 ═══
+async function sha256(s){
+  const b=new TextEncoder().encode(s);
+  const h=await crypto.subtle.digest('SHA-256',b);
+  return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+// ═══ CHAIN SIM ═══
+const cth=$('cth'),sbk=$('sbk'),stx=$('stx'),srt=$('srt');
+let sIdx=0,sTx=0,sPrev='';
+function nt(){return new Date().toTimeString().slice(0,8)}
+
+async function mkBlk(mined=false){
+  const tc=200+Math.floor(Math.random()*800);
+  const d=`${sIdx}|${nt()}|${tc}|${sPrev}|${Math.random()}`;
+  const h=await sha256(d);
+  return {index:sIdx,timestamp:nt(),hash:h,prevHash:sPrev||'0'.repeat(64),txCount:tc,mined};
+}
+
+function rBlk(b){
+  const d=document.createElement('div');
+  d.className='bk'+(b.mined?' mine':'');
+  d.innerHTML=`<div class="bh"><span>BLOCK #${String(b.index).padStart(5,'0')}</span><span style="color:var(--wk)">${b.timestamp}</span></div>
+<div class="br">HASH<strong class="hot">0x${b.hash.slice(0,20)}...</strong></div>
+<div class="br">PREV<strong style="color:var(--wk)">0x${b.prevHash.slice(0,12)}...</strong></div>
+<div class="br">TX<strong class="hot">${b.txCount}</strong></div>
+${b.mined?'<div class="br"><strong class="hl">▸ MINÉ PAR VOUS</strong></div>':''}`;
+  cth.appendChild(d);
+  while(cth.children.length>25)cth.removeChild(cth.firstChild);
+  sbk.textContent=b.index+1;sTx+=b.txCount;
+  stx.textContent=sTx.toLocaleString('fr-FR');
+  const off=Math.max(0,cth.scrollWidth-cth.parentElement.clientWidth+40);
+  cth.style.transform=`translateX(-${off}px)`;
+}
+
+async function adB(m=false){
+  const b=await mkBlk(m);
+  sPrev=b.hash;sIdx++;
+  rBlk(b);
+  pVx(sIdx%16);pTs();sBlk();
+}
+(async()=>{for(let i=0;i<6;i++)await adB();setInterval(()=>adB(),4000)})();
+
+let rSh=0,rTg=14000;
+setInterval(()=>{rTg=10000+Math.random()*8000},2200);
+setInterval(()=>{rSh+=(rTg-rSh)*.08;srt.textContent=Math.floor(rSh).toLocaleString('fr-FR')},60);
+
+// ═══ TAMPER ═══
+const tchE=$('tch'),tcsE=$('tcs'),rF=$('redFlood');
+const iniT=['Alice → Bob : 50 TSC','Bob → Carol : 30 TSC','Carol → Dave : 20 TSC','Dave → Eve : 10 TSC','Eve → Alice : 5 TSC'];
+let tBlks=[];
+
+async function bTCh(){
+  tBlks=[];let pv='0'.repeat(64);
+  for(let i=0;i<iniT.length;i++){
+    const d=iniT[i];const h=await sha256(`${i}|${d}|${pv}`);
+    tBlks.push({index:i,data:d,hash:h,prevHash:pv,oH:h,oP:pv,valid:true});pv=h;
+  }
+  rTCh();tLog('▸ Chaîne initiale synchronisée. 5 blocs validés.','ok');
+}
+
+function rTCh(){
+  tchE.innerHTML='';
+  tBlks.forEach((b,i)=>{
+    const d=document.createElement('div');
+    const cls=i===1?'source':(b.valid?'':'invalid');
+    d.className='tb'+(cls?' '+cls:'');
+    const st=i===1?'✎ MODIFIABLE':(b.valid?'✓ VALIDE':'✗ INVALIDE');
+    d.innerHTML=`<div class="tbh"><span>#${String(i).padStart(3,'0')}</span><span class="tbs">${st}</span></div>
+<div class="tbl">Données</div><div class="tbd">${b.data}</div>
+<input class="tbe" value="${b.data}" data-hover>
+<div class="tbl">Hash</div><div class="tbhs">${b.hash.slice(0,32)}...</div>
+<div class="tbl">Prev</div><div class="tbhs">${b.prevHash.slice(0,16)}...</div>`;
+    tchE.appendChild(d);
+  });
+  const inp=tchE.querySelector('.tbe');
+  if(inp){inp.addEventListener('input',e=>tEd(e.target.value));inp.addEventListener('focus',()=>sHov('A5'))}
+}
+
+function tLog(m,cls=''){
+  const d=document.createElement('div');
+  d.className='tcl'+(cls?' '+cls:'');
+  d.innerHTML=`<span class="p">&gt;</span>${m}`;
+  tcsE.appendChild(d);tcsE.scrollTop=tcsE.scrollHeight;
+  while(tcsE.children.length>40)tcsE.removeChild(tcsE.firstChild);
+}
+
+async function tEd(nv){
+  tBlks[1].data=nv;
+  let pv=tBlks[0].hash;
+  for(let i=1;i<tBlks.length;i++){
+    const b=tBlks[i];b.prevHash=pv;
+    b.hash=await sha256(`${i}|${b.data}|${pv}`);
+    b.valid=(b.hash===b.oH&&b.prevHash===b.oP);pv=b.hash;
+  }
+  rTCh();
+  const br=tBlks.filter(b=>!b.valid).length;
+  if(br>0){
+    tLog(`⚠  ALTÉRATION DÉTECTÉE sur bloc #001`,'warn');
+    tLog(`   hash modifié → ${br} bloc(s) suivant(s) invalidé(s) en cascade`,'err');
+    tLog(`   le réseau rejetterait cette chaîne en &lt;50ms`,'err');
+    sRM(1);shake();rF.classList.add('on');
+    setTimeout(()=>rF.classList.remove('on'),400);
+    cursor.classList.add('danger');
+    setTimeout(()=>cursor.classList.remove('danger'),600);
+    tBlks.forEach((b,i)=>{if(!b.valid)pVx(i*3,true)});
+    sTmp();
+  }
+}
+
+async function rTmp(){
+  tcsE.innerHTML='';await bTCh();
+  tLog('✓ Chaîne restaurée. Immutabilité rétablie.','ok');
+  sRM(0);sWin();
+}
+$('resetT').addEventListener('click',rTmp);
+bTCh();
+
+// ═══ MINING ═══
+const mbtn=$('mbtn'),mcs=$('mcs'),lvn=$('lvn'),lvr=$('lvr'),lvt=$('lvt'),mid=$('mid');
+function rh(n){const c='0123456789ABCDEF';let s='';for(let i=0;i<n;i++)s+=c[Math.floor(Math.random()*16)];return s}
+mid.textContent='0x'+rh(4)+'...'+rh(4);
+
+function mLog(m,cls=''){
+  const d=document.createElement('div');d.className='cl'+(cls?' '+cls:'');
+  d.innerHTML=`<span class="p">&gt;</span>${m}`;
+  mcs.appendChild(d);mcs.scrollTop=mcs.scrollHeight;
+  while(mcs.children.length>100)mcs.removeChild(mcs.firstChild);
+}
+
+const DIFF='0000';
+async function rMine(){
+  mbtn.disabled=true;mbtn.textContent='⧫ MINAGE EN COURS...';
+  mcs.innerHTML='';gMd=.8;
+  mLog('tesseract.chain // Web Crypto API SHA-256','info');
+  mLog(`mineur_id: ${mid.textContent}`,'mag');
+  mLog(`target: hash commence par <strong style="color:var(--cy)">${DIFF}</strong>`);
+  mLog('');
+  mLog('▸ construction du bloc candidat...','info');
+  mLog(`   previous_hash: ${sPrev.slice(0,32)}...`);
+  const tic=128+Math.floor(Math.random()*256);
+  mLog(`   transactions: ${tic}`);
+  mLog(`   timestamp: ${nt()}`);
+  mLog('');
+  mLog('▸ recherche de nonce valide...','info');
+  await new Promise(r=>setTimeout(r,300));
+
+  const bd=`${sIdx}|${sPrev}|${tic}|${nt()}`;
+  const tS=performance.now();
+  let nc=0,h='';const BT=250;let lL=0,lS=0;
+
+  while(true){
+    for(let i=0;i<BT;i++){
+      h=await sha256(bd+'|'+nc);
+      if(h.startsWith(DIFF))break;
+      nc++;
+    }
+    const el=(performance.now()-tS)/1000,rt=Math.floor(nc/el);
+    lvn.textContent=nc.toLocaleString('fr-FR');
+    lvr.textContent=rt.toLocaleString('fr-FR');
+    lvt.textContent=el.toFixed(1)+'s';
+    if(h.startsWith(DIFF))break;
+    if(performance.now()-lL>420){
+      lL=performance.now();
+      mLog(`nonce=${String(nc).padStart(7,'0')} hash=0x${h.slice(0,20)}... <span style="color:var(--rd)">✗</span>`);
+      if(performance.now()-lS>400){lS=performance.now();sMh()}
+      pVx(Math.floor(Math.random()*16));
+    }
+    await new Promise(r=>setTimeout(r,0));
+    if(nc>2000000){mLog('⚠ abandon après 2M tentatives','err');mbtn.disabled=false;mbtn.textContent='⧫ RELANCER';return}
+  }
+
+  const el=(performance.now()-tS)/1000,rt=Math.floor(nc/el);
+  lvn.textContent=nc.toLocaleString('fr-FR');
+  lvr.textContent=rt.toLocaleString('fr-FR');
+  lvt.textContent=el.toFixed(2)+'s';
+  mLog('');
+  mLog('✦ HASH VALIDE TROUVÉ','ok');
+  mLog(`   nonce = <strong style="color:var(--cy)">${nc.toLocaleString('fr-FR')}</strong>`,'ok');
+  mLog(`   hash  = <strong style="color:var(--cy)">0x${h}</strong>`,'ok');
+  mLog(`   temps = ${el.toFixed(2)}s @ ${rt.toLocaleString('fr-FR')} H/s`,'ok');
+  mLog('');
+  mLog('▸ diffusion du bloc sur le réseau...','info');
+  await new Promise(r=>setTimeout(r,500));
+  mLog('▸ 248/256 nœuds ont validé le bloc','info');
+  await new Promise(r=>setTimeout(r,400));
+  mLog('✦ BLOC AJOUTÉ À LA CHAÎNE','mag');
+  mLog('✦ RÉCOMPENSE : +6,25 TSC','mag');
+  const fl=$('flash');fl.classList.add('on');
+  setTimeout(()=>fl.classList.remove('on'),180);
+  pTs();
+  for(let i=0;i<16;i++)setTimeout(()=>pVx(i),i*40);
+  sWin();await adB(true);
+  await new Promise(r=>setTimeout(r,1800));
+  gMd=0;mbtn.disabled=false;mbtn.textContent='⧫ MINER UN AUTRE BLOC';
+}
+mbtn.addEventListener('click',rMine);
+
+// ═══ SCRAMBLE TYPE ═══
+function scrmb(el,dur=900){
+  if(el.dataset.scr)return;el.dataset.scr='1';
+  const txt=el.textContent;
+  const chars='!@#$%^&*()_+-={}[]|;:,.<>?/~ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const st=performance.now();const fH=el.innerHTML;
+  function step(){
+    const p=clamp((performance.now()-st)/dur,0,1);
+    const rv=Math.floor(txt.length*p);
+    let out='';
+    for(let i=0;i<txt.length;i++){
+      if(i<rv)out+=txt[i];
+      else if(txt[i]===' '||txt[i]==='\n')out+=txt[i];
+      else out+=chars[Math.floor(Math.random()*chars.length)];
+    }
+    el.textContent=out;
+    if(p<1)requestAnimationFrame(step);
+    else el.innerHTML=fH;
+  }
+  step();
+}
+
+// ═══ REVEAL ═══
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('in');
+      if(e.target.matches('.scr'))setTimeout(()=>scrmb(e.target),200);
+    }
+  });
+},{threshold:.15});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+// ═══ CLI ═══
+const cli=$('cli'),cin=$('cin'),chist=$('chist'),cliBtn=$('cliBtn');
+function cOpen(){cli.classList.add('open');cliBtn.classList.add('active');setTimeout(()=>cin.focus(),200);sClk()}
+function cClose(){cli.classList.remove('open');cliBtn.classList.remove('active');sClk()}
+function cTg(){cli.classList.contains('open')?cClose():cOpen()}
+cliBtn.addEventListener('click',cTg);
+
+addEventListener('keydown',e=>{
+  if($('boot')&&!$('boot').classList.contains('gone'))return;
+  if(e.key==='²'||e.key==='`'){e.preventDefault();cTg()}
+  if(e.key==='Escape'&&cli.classList.contains('open'))cClose();
+});
+
+function cO(t,c=''){const d=document.createElement('div');d.className=c;d.innerHTML=t;chist.appendChild(d);chist.scrollTop=chist.scrollHeight}
+
+const cmd={
+  help(){
+    cO('<span class="out">TESSERACT.CLI // commandes :</span>');
+    cO('  help ........... aide');
+    cO('  mine ........... lancer le minage');
+    cO('  tamper ......... altérer bloc test');
+    cO('  reset .......... réinitialiser chaîne');
+    cO('  fly &lt;section&gt;    naviguer (hero/concept/dim/time/sim/tamper/mine/outro)');
+    cO('  audio .......... basculer audio');
+    cO('  nodes .......... état réseau');
+    cO('  hash &lt;texte&gt;    calculer SHA-256');
+    cO('  pulse .......... pulser tesseract');
+    cO('  red ............ mode rouge');
+    cO('  clear .......... effacer');
+    cO('  exit ........... fermer');
+  },
+  mine(){cO('<span class="out">▸ minage...</span>');$('mining').scrollIntoView({behavior:'smooth'});setTimeout(()=>mbtn.click(),800);cClose()},
+  tamper(){cO('<span class="out">▸ altération bloc #001</span>');$('tamper').scrollIntoView({behavior:'smooth'});setTimeout(()=>tEd('Alice → Bob : 9999 TSC'),1200);cClose()},
+  reset(){cO('<span class="out">▸ réinitialisation...</span>');rTmp()},
+  audio(){tAudio();cO('<span class="out">▸ audio '+(aE?'activé':'désactivé')+'</span>')},
+  nodes(){
+    cO('<span class="out">─── NETWORK STATUS ───</span>');
+    cO('  nodes_total    : 256');
+    cO('  nodes_online   : '+(248+Math.floor(Math.random()*8)));
+    cO('  consensus      : <span style="color:var(--cy)">validated</span>');
+    cO('  block_height   : '+sIdx);
+    cO('  hashrate       : '+(10000+Math.floor(Math.random()*8000)).toLocaleString('fr-FR')+' H/s');
+  },
+  async hash(a){
+    const t=a.join(' ');
+    if(!t){cO('<span class="err">usage : hash &lt;texte&gt;</span>');return}
+    const h=await sha256(t);
+    cO('  input  : '+t);
+    cO('  sha256 : <span style="color:var(--cy)">'+h+'</span>');
+  },
+  fly(a){
+    const m={hero:'hero',concept:'concept',dim:'dimensions',dimensions:'dimensions',time:'timeline',timeline:'timeline',sim:'simulation',simulation:'simulation',tamper:'tamper',mine:'mining',mining:'mining',outro:'outro'};
+    const id=m[a[0]];
+    if(!id){cO('<span class="err">cible inconnue : hero|concept|dim|time|sim|tamper|mine|outro</span>');return}
+    $(id).scrollIntoView({behavior:'smooth'});
+    cO('<span class="out">▸ navigation vers /'+id+'</span>');cClose();
+  },
+  pulse(){pTs();for(let i=0;i<16;i++)setTimeout(()=>pVx(i),i*50);cO('<span class="out">▸ pulse</span>')},
+  red(){sRM(1);shake();sTmp();cO('<span class="out">▸ red mood</span>')},
+  clear(){chist.innerHTML=''},
+  exit(){cClose()}
+};
+
+cin.addEventListener('keydown',async e=>{
+  if(e.key==='Enter'){
+    const v=cin.value.trim();cin.value='';
+    if(!v)return;
+    const ps=v.split(/\s+/),c=ps[0].toLowerCase(),a=ps.slice(1);
+    cO('<span class="echo">tesseract@chain:~$ '+v+'</span>');sClk();
+    if(cmd[c]){try{await cmd[c](a)}catch(err){cO('<span class="err">erreur : '+err.message+'</span>')}}
+    else cO('<span class="err">commande inconnue : '+c+' — tapez <strong>help</strong></span>');
+  }
+});
+cO('<span style="color:var(--wk)">TESSERACT.CLI v3.0 — tapez <strong style="color:var(--cy)">help</strong></span>');
+
+// ═══ KICKOFF ═══
+runBoot();
+</script>
+</body>
+</html>
