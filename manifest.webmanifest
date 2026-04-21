@@ -1,0 +1,33 @@
+{
+  "name": "TESSERACT.CHAIN",
+  "short_name": "Tesseract",
+  "description": "Exploration interactive et parcours pédagogique pour comprendre la blockchain. Deux portes d'entrée, une identité visuelle. Open-source, sans compte, sans serveur.",
+  "lang": "fr-FR",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00f0ff",
+  "categories": ["education", "utilities", "developer"],
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Académie",
+      "short_name": "Académie",
+      "description": "Parcours pédagogique en 6 chapitres",
+      "url": "./academy.html"
+    },
+    {
+      "name": "Chapitre 1 — Le hash",
+      "short_name": "Ch 1",
+      "description": "Première leçon : qu'est-ce qu'un hash ?",
+      "url": "./academy/1-le-hash.html"
+    }
+  ]
+}
