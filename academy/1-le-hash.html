@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 1 — Le hash · TESSERACT.CHAIN Académie</title>
+<meta name="description" content="Première leçon : comprendre ce qu'est un hash. Une fonction qui transforme n'importe quel texte en empreinte de 256 bits. Déterministe, sensible, irréversible.">
+<meta name="theme-color" content="#00f0ff">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Chapitre 1 — Le hash · TESSERACT.CHAIN Académie">
+<meta property="og:description" content="Apprenez la brique fondatrice de toute blockchain : le hash.">
+<meta property="og:type" content="article">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-page="chapter">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN — Chapitre 1</h1><p>Ce chapitre a besoin de JavaScript pour fonctionner. Activez-le, puis rechargez la page.</p></div></div></noscript>
+
+<!-- Overlays partagés -->
+<div id="chromAb" aria-hidden="true"></div>
+<button type="button" class="vertexmark" id="vmark" aria-label="Blocs minés — cliquez pour voir vos statistiques">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span><span class="vertexmark__hint">▸ CLIC POUR DÉTAIL</span></button>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true">
+  <div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div>
+  <div id="xBody"></div>
+</aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X">
+  <button class="xclose" id="xrClose" data-hover>✕ SORTIR</button>
+  <h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3>
+  <pre id="xrDump">—</pre>
+</div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée. Tapez help pour la liste des commandes.</span></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>CH_01</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="../academy.html" data-hover>◆ ACADÉMIE</a>
+<span class="hwallet" id="hwallet" data-hover title="Votre wallet simulé — cliquez pour détails"><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section id="ch-hero">
+<div class="inner" style="--c:#00f0ff">
+  <nav class="ch-crumb" aria-label="Fil d'Ariane">
+    <a href="../academy.html">Académie</a>
+    <span class="sep">/</span>
+    <span class="curr">Chapitre 1</span>
+  </nav>
+  <div class="ch-num">CHAPITRE 01 · ★ DÉBUTANT</div>
+  <h1 class="ch-title">Le <em>hash</em>.<br>L'empreinte numérique.</h1>
+  <p class="ch-lede">Comment prouver que deux fichiers sont identiques <strong>sans comparer chaque octet</strong> ? Comment détecter qu'un message a été modifié <strong>sans avoir l'original</strong> ? La réponse à ces deux questions tient dans un seul objet : <strong>le hash</strong>. Tout l'édifice blockchain repose sur cette brique.</p>
+  <div class="ch-meta"><span>Durée <strong>≈ 10 min</strong></span><span>Niveau <strong>★ Débutant</strong></span><span>Prérequis <strong>Aucun</strong></span></div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00f0ff">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">01</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Raconter</div>
+      <h2 class="ch-step__t">Un <em>détecteur</em> de modifications.</h2>
+      <p>Imagine que tu envoies un long document à quelqu'un. Comment sait-il que tu n'as pas glissé une virgule, un chiffre, un caractère invisible ? Une méthode naïve : qu'il relise tout, caractère par caractère. Une méthode intelligente : tu accompagnes le document d'une <strong>empreinte</strong> — un petit code qui change complètement au moindre octet modifié.</p>
+      <p>Cette empreinte s'appelle un <span class="gloss" data-term="hash">hash</span>. Ce site utilise l'algorithme <span class="gloss" data-term="sha256">SHA-256</span>, le même que Bitcoin. Il prend n'importe quoi — un mot, un roman, un film — et renvoie toujours une chaîne de 64 caractères hexadécimaux.</p>
+      <div class="ch-analogy">
+        <strong>Analogie.</strong> Un hash, c'est comme une <strong>empreinte digitale pour des données</strong>. Deux personnes n'ont jamais la même empreinte ; deux fichiers différents n'ont jamais le même hash. Mais il est impossible de reconstituer une main à partir de son empreinte — et c'est précisément cette irréversibilité qui sécurise la blockchain.
+      </div>
+      <p>Trois propriétés rendent le hash utile :</p>
+      <ul>
+        <li><strong>Déterministe</strong> — même entrée, toujours même sortie.</li>
+        <li><strong>Effet avalanche</strong> — la moindre modification change tout.</li>
+        <li><strong>Irréversible</strong> — impossible en pratique de retrouver l'entrée à partir de la sortie.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00f0ff">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">02</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Montrer</div>
+      <h2 class="ch-step__t">Voir l'<em>avalanche</em>.</h2>
+      <p>Ci-dessous, tape n'importe quel texte. Son hash SHA-256 est calculé en direct par ton navigateur (via la <code>Web Crypto API</code>). Modifie <strong>une seule lettre</strong>, même une majuscule en minuscule, et observe : les caractères qui ont changé apparaissent en magenta, et un compteur t'indique combien de <strong>bits</strong> ont basculé sur les 256 du hash.</p>
+      <p>En théorie, un bon algorithme de hash fait basculer environ 128 bits sur 256 quand on modifie une seule lettre en entrée — une parité imprévisible. C'est la signature d'une fonction cryptographique solide.</p>
+      <div class="ch-demo">
+        <div class="ch-demo-label">▸ LABORATOIRE SHA-256</div>
+        <label for="ch1Input" class="visually-hidden">Texte à hacher</label>
+        <input id="ch1Input" class="hashlab-input" type="text" autocomplete="off" spellcheck="false" value="Le hash est la brique fondatrice.">
+        <div class="hashlab-hash" id="ch1Hash" aria-live="polite" aria-atomic="true"></div>
+        <div class="hashlab-meta"><span>Taille entrée <strong id="ch1Len">—</strong></span><span>Bits différents <strong id="ch1Diff">—</strong></span><span>Hex différents <strong id="ch1HexDiff">—</strong></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00f0ff">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">03</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Faire</div>
+      <h2 class="ch-step__t">Contrôler l'<em>imprévisible</em>.</h2>
+      <p>La propriété déterministe est précieuse mais simple : deux mêmes entrées produisent deux mêmes sorties. La propriété intéressante, c'est qu'on ne peut <strong>pas choisir</strong> la sortie. On ne peut que <strong>varier l'entrée jusqu'à trouver</strong> la sortie qu'on cherche.</p>
+      <p>Essaie : tape des mots différents dans le labo ci-dessus et regarde s'il t'est possible d'obtenir un hash qui commence par un caractère précis. La seule méthode est <strong>l'essai-erreur</strong>. Cette contrainte, qu'on subit ici en jouant, est exactement celle qui sécurise tout le réseau Bitcoin. Dans le chapitre 3, tu verras que <strong>miner un bloc</strong>, c'est exactement ça : essayer des entrées jusqu'à obtenir un hash valide.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff00d4">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">04</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Défier</div>
+      <h2 class="ch-step__t">Trouve le <em>mot magique</em>.</h2>
+      <p>Ton défi : trouver un <strong>mot ou une phrase</strong> dont le hash SHA-256 commence par deux zéros (<code>00</code>). Ça arrive en moyenne <strong>1 fois sur 256</strong> essais — donc quelques dizaines de tentatives suffisent. Tu peux essayer des mots, des chiffres, des phrases, ajouter un numéro à la fin, tout ce que tu veux.</p>
+      <p>Sans le savoir, tu viens de faire exactement ce que fait un <strong>mineur Bitcoin</strong>, mais à une difficulté ridiculement basse. Bitcoin exige aujourd'hui environ <strong>19 zéros</strong>. Tu imagines l'ordre de grandeur ?</p>
+      <div class="ch-chall" data-challenge="1.hash-00">
+        <div class="ch-chall__h">
+          <span class="ch-chall__k">◆ DÉFI // TROUVER UN HASH EN 00…</span>
+          <span class="ch-chall__status" id="ch1ChallStatus">EN ATTENTE</span>
+        </div>
+        <p class="ch-chall__prompt">Tape un mot et appuie sur <strong>Entrée</strong>. Le hash doit commencer par <code>00</code>.</p>
+        <div class="ch-chall__input-row">
+          <input id="ch1ChallInput" class="ch-chall__input" type="text" autocomplete="off" spellcheck="false" placeholder="Essaie un mot, puis un autre…">
+          <button id="ch1ChallSubmit" class="ch-chall__submit" type="button" data-hover>TESTER</button>
+        </div>
+        <div class="ch-chall__hash" id="ch1ChallHash">—</div>
+        <div class="ch-chall__feedback" id="ch1ChallFeedback" role="status" aria-live="polite"></div>
+        <div class="ch-chall__tries"><span>Tentatives <strong id="ch1ChallTries">0</strong></span><span>Objectif <strong>hash commençant par 00</strong></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00ff88">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">05</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Retenir</div>
+      <h2 class="ch-step__t">Ce qu'il faut <em>garder</em>.</h2>
+      <div class="ch-summary">
+        <div class="ch-summary__k">◆ À RETENIR</div>
+        <ul>
+          <li>Un <strong>hash</strong> est une empreinte de taille fixe (256 bits pour SHA-256) qui caractérise n'importe quelle donnée.</li>
+          <li>Même entrée → <strong>toujours</strong> même sortie. Entrée modifiée d'un seul caractère → sortie entièrement différente (effet avalanche).</li>
+          <li>Impossible en pratique de retrouver l'entrée à partir de la sortie. La seule façon d'obtenir un hash spécifique est <strong>l'essai-erreur</strong>.</li>
+          <li>C'est la brique fondatrice de la blockchain : chaque bloc sera identifié par son hash, et modifiera la chaîne entière en aval si tu le modifies.</li>
+        </ul>
+      </div>
+      <div class="ch-quiz" aria-label="Quiz de fin de chapitre">
+        <div class="ch-quiz__k">◆ QUIZ // 3 QUESTIONS</div>
+
+        <div class="ch-q" data-q="1" data-correct="2">
+          <div class="ch-q__num">QUESTION 1 / 3</div>
+          <div class="ch-q__t">Si je change <strong>une seule lettre</strong> dans l'entrée, le hash produit…</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>reste identique.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>change d'une seule lettre.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>change complètement (effet avalanche).</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Effet avalanche.</strong> Un bon algorithme cryptographique fait basculer environ la moitié des bits en sortie pour un seul bit changé en entrée — ni une lettre près, ni l'identité.</div>
+        </div>
+
+        <div class="ch-q" data-q="2" data-correct="1">
+          <div class="ch-q__num">QUESTION 2 / 3</div>
+          <div class="ch-q__t">Peut-on retrouver le <strong>texte original</strong> à partir de son hash ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Oui, en « décryptant ».</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Non, c'est impossible en pratique.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Oui, si on a la clé privée.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Irréversibilité.</strong> Un hash n'est pas un chiffrement : il n'existe pas de clé permettant de l'inverser. La seule façon de « retrouver » une entrée est de la deviner puis de re-hacher pour vérifier.</div>
+        </div>
+
+        <div class="ch-q" data-q="3" data-correct="1">
+          <div class="ch-q__num">QUESTION 3 / 3</div>
+          <div class="ch-q__t">Combien de bits fait un hash <strong>SHA-256</strong> ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>128 bits.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>256 bits.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>512 bits.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Le nom le dit.</strong> SHA-<strong>256</strong> produit 256 bits, soit 32 octets, soit 64 caractères hexadécimaux. SHA-512 existe aussi, et est utilisé là où on veut encore plus de sécurité (ex. certains systèmes de signature).</div>
+        </div>
+
+        <div class="ch-quiz__score" id="ch1QuizScore">
+          <div class="ch-quiz__score-l">Score</div>
+          <div class="ch-quiz__score-n"><span id="ch1QuizN">0</span><span style="color:var(--wk)">/3</span></div>
+          <div class="ch-quiz__score-l" id="ch1QuizMsg">—</div>
+        </div>
+      </div>
+
+      <nav class="ch-nav" aria-label="Navigation entre chapitres">
+        <a class="ch-nav__prev" href="../academy.html"><span class="ch-nav__k">◂ retour</span><span class="ch-nav__t">Académie</span></a>
+        <span class="ch-nav__next ch-nav__locked"><span class="ch-nav__k">suivant ▸</span><span class="ch-nav__t">Chapitre 2 · bientôt</span></span>
+      </nav>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Chapitre 1 du parcours Académie — le hash, brique fondatrice. Démonstrations en SHA-256 réel via Web Crypto API. Progression sauvegardée localement, aucun serveur.</p>
+</div>
+<div class="fc"><h4>Parcours</h4><ul><li>▸ <strong style="color:var(--cy)">Chapitre 1 — Le hash</strong></li><li>▸ Chapitre 2 — Le bloc</li><li>▸ Chapitre 3 — La course au nonce</li><li>▸ Chapitre 4 — Les identités</li><li>▸ Chapitre 5 — Le consensus</li><li>▸ Chapitre 6 — Les programmes</li></ul></div>
+<div class="fc"><h4>Ressources</h4><ul><li>▸ Bitcoin whitepaper</li><li>▸ SHA-256 (FIPS 180-4)</li><li>▸ Web Crypto API</li></ul></div>
+<div class="fc"><h4>Contrôles</h4><ul><li>▸ ² ou ~ : CLI</li><li>▸ clic terme souligné : glossaire</li><li>▸ Esc : fermer overlay</li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN — CHAPITRE 1 // MIT</span><span id="fcrd">CH 01/06</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="../src/lifecycle.js"></script>
+<script src="../src/ui.js"></script>
+<script src="../src/core.js"></script>
+<script src="../src/extensions.js"></script>
+<script src="../src/academy.js"></script>
+<script src="../src/chapter-1.js"></script>
+</body>
+</html>
