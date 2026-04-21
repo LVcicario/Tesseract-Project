@@ -614,6 +614,11 @@ async function tEd(nv){
     setTimeout(()=>cursor.classList.remove('danger'),600);
     tBlks.forEach((b,i)=>{if(!b.valid)pVx(i*3,true)});
     sTmp();
+    // Event bus: announce tamper break so extensions can trigger
+    // the global glitch, chromatic aberration and contextual note.
+    window.dispatchEvent(new CustomEvent('tsc:tampered',{detail:{
+      brokenCount:br,totalBlocks:tBlks.length,at:Date.now()
+    }}));
   }
 }
 
@@ -689,6 +694,12 @@ async function rMine(){
   mLog(`   hash  = <strong style="color:var(--cy)">0x${h}</strong>`,'ok');
   mLog(`   temps = ${el.toFixed(2)}s @ ${rt.toLocaleString('fr-FR')} H/s`,'ok');
   mLog('');
+  // Event bus: announce the mined block to any extension listener
+  // (wallet credit, leaderboard, vertex marker, explorer). The DOM
+  // scraping via MutationObserver is kept as a legacy fallback only.
+  window.dispatchEvent(new CustomEvent('tsc:blockMined',{detail:{
+    hash:h,nonce:nc,timeSec:el,hashRate:rt,minerId:mid.textContent,at:Date.now()
+  }}));
   mLog('▸ diffusion du bloc sur le réseau...','info');
   await new Promise(r=>setTimeout(r,500));
   mLog('▸ 248/256 nœuds ont validé le bloc','info');

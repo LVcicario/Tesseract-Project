@@ -152,22 +152,42 @@
   }
 
   // ═══ Tamper : annotation + glitch global ═══
+  // Tamper break — listen to the explicit event emitted by core.rMine()'s
+  // sibling tEd(). The previous implementation observed DOM class changes
+  // on #tch which was fragile (coupled to core.js rendering internals).
   const tch=$('tch'),tanno=$('tanno');
+  window.addEventListener('tsc:tampered',e=>{
+    const broken=(e.detail&&e.detail.brokenCount)||0;
+    if(broken>0){
+      if(tanno)tanno.classList.add('on');
+      const tw=document.querySelector('.tw');
+      if(tw&&!tw.classList.contains('shake')){
+        tw.classList.add('shake');
+        setTimeout(()=>tw.classList.remove('shake'),500);
+      }
+      if(tch&&!tch.dataset.glitched){
+        tch.dataset.glitched='1';
+        triggerGlitch();
+        setTimeout(()=>{delete tch.dataset.glitched},800);
+      }
+    } else if(tanno){
+      tanno.classList.remove('on');
+    }
+  });
+  // Also listen to the tamper reset (when user clicks "réinitialiser") —
+  // we watch #tch attribute changes just to clear the annotation when
+  // invalid blocks disappear. This observer is scoped to a single
+  // attribute and registered for cleanup on pagehide.
   if(tch){
-    const mo=new MutationObserver(()=>{
-      const hasInvalid=tch.querySelector('.tb.invalid');
-      if(hasInvalid){
-        if(tanno)tanno.classList.add('on');
-        const tw=document.querySelector('.tw');
-        if(tw&&!tw.classList.contains('shake')){tw.classList.add('shake');setTimeout(()=>tw.classList.remove('shake'),500)}
-        if(!tch.dataset.glitched){tch.dataset.glitched='1';triggerGlitch();setTimeout(()=>{delete tch.dataset.glitched},800)}
-      } else { if(tanno)tanno.classList.remove('on') }
+    const resetObserver=new MutationObserver(()=>{
+      if(!tch.querySelector('.tb.invalid')&&tanno)tanno.classList.remove('on');
     });
-    mo.observe(tch,{subtree:true,attributes:true,attributeFilter:['class']});
+    resetObserver.observe(tch,{subtree:true,attributes:true,attributeFilter:['class']});
+    window.addEventListener('pagehide',()=>resetObserver.disconnect());
   }
 
   // ═══ Leaderboard + capture bloc miné → wallet + vertex mark ═══
-  const lbRows=$('lbRows'),lbClear=$('lbClear'),mcs=$('mcs'),mid=$('mid');
+  const lbRows=$('lbRows'),lbClear=$('lbClear'),mid=$('mid');
   function lbLoad(){try{return JSON.parse(localStorage.getItem(BK)||'[]')}catch(e){return[]}}
   function lbSave(a){try{localStorage.setItem(BK,JSON.stringify(a.slice(0,16)))}catch(e){}}
   function lbRender(){
@@ -181,31 +201,35 @@
   }
   if(lbClear)lbClear.addEventListener('click',()=>{if(confirm('Effacer tous les blocs minés ?')){lbSave([]);lbRender()}});
 
-  if(mcs){
-    const moM=new MutationObserver(muts=>{
-      for(const m of muts)for(const n of m.addedNodes){
-        if(n.nodeType!==1)continue;
-        const txt=n.textContent||'';
-        const mH=txt.match(/hash\s*=\s*0x([0-9a-f]{20,})/i);
-        if(mH){
-          const hash=mH[1];
-          const lvt=$('lvt'),t=lvt?parseFloat(lvt.textContent)||0:0;
-          const d=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-          const a=lbLoad();
-          if(!a.some(x=>x.h===hash)){
-            a.unshift({h:hash,t,d,m:mid?mid.textContent:'0x---',nonce:parseInt(($('lvn').textContent||'0').replace(/\D/g,''))||0,ts:Date.now()});
-            lbSave(a);lbRender();
-            walletCredit(6.25);
-            // tesseract absorbs — flash déjà géré par code existant, on amplifie
-            if(window.Tone&&Tone.context&&Tone.context.state==='running'){
-              try{const s=new Tone.Synth({oscillator:{type:'sine'},volume:-12,envelope:{attack:.01,decay:.4,sustain:0,release:.3}}).toDestination();s.triggerAttackRelease('C6','8n');setTimeout(()=>s.dispose(),800)}catch(e){}
-            }
-          }
-        }
-      }
+  // Block mined — listen to the explicit 'tsc:blockMined' event emitted
+  // by core.rMine() when a valid hash is found. This replaces a fragile
+  // MutationObserver + regex-on-text that silently broke if the mining
+  // log format ever changed.
+  window.addEventListener('tsc:blockMined',e=>{
+    const d=e.detail||{};
+    const hash=d.hash;
+    if(!hash)return;
+    const a=lbLoad();
+    if(a.some(x=>x.h===hash))return;
+    a.unshift({
+      h:hash,
+      t:d.timeSec||0,
+      d:new Date(d.at||Date.now()).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),
+      m:d.minerId||(mid?mid.textContent:'0x---'),
+      nonce:d.nonce||0,
+      ts:d.at||Date.now()
     });
-    moM.observe(mcs,{childList:true});
-  }
+    lbSave(a);
+    lbRender();
+    walletCredit(6.25);
+    if(window.Tone&&Tone.context&&Tone.context.state==='running'){
+      try{
+        const s=new Tone.Synth({oscillator:{type:'sine'},volume:-12,envelope:{attack:.01,decay:.4,sustain:0,release:.3}}).toDestination();
+        s.triggerAttackRelease('C6','8n');
+        setTimeout(()=>s.dispose(),800);
+      }catch(_){}
+    }
+  });
 
   // ═══ Block explorer modal ═══
   async function openExplorer(idx){
@@ -330,7 +354,25 @@
       cLine('<span class="out">▸ mode byzantin '+(on?'<span style="color:var(--rd)">ACTIVÉ</span> — 46 nœuds menteurs':'<span style="color:var(--gr)">désactivé</span>')+'</span>');
     }
   };
-  // intercepter Enter en capture pour gérer nos commandes avant le handler existant
+
+  function appendV21Help(){
+    cLine('<span class="out">  ─── v2.1 ───</span>');
+    cLine('  wallet ......... infos wallet');
+    cLine('  balance ........ solde TSC');
+    cLine('  stake &lt;n&gt; ...... miser n TSC (PoS simulé)');
+    cLine('  deploy &lt;c&gt; ..... déployer contrat (counter, vote)');
+    cLine('  call &lt;a&gt; &lt;m&gt; ... appeler méthode de contrat');
+    cLine('  contracts ...... lister contrats déployés');
+    cLine('  mempool ........ voir transactions en attente');
+    cLine('  explore &lt;n&gt; .... ouvrir explorateur de bloc');
+    cLine('  xray ........... mode rayons-X');
+    cLine('  byzantine on|off  simuler nœuds malveillants');
+  }
+
+  // Intercept Enter in the capture phase so v2.1 commands run before
+  // core.js's own keydown handler. For `help` we let core render its
+  // built-in lines first, then append the v2.1 section on the next
+  // tick — no DOM scraping required.
   if(cin){
     cin.addEventListener('keydown',async e=>{
       if(e.key!=='Enter')return;
@@ -341,12 +383,10 @@
         cin.value='';
         cLine('<span class="echo">tesseract@chain:~$ '+v+'</span>');
         try{await myCmd[c](a)}catch(err){cLine('<span class="err">erreur : '+err.message+'</span>')}
+      } else if(c==='help'){
+        setTimeout(appendV21Help,0);
       }
     },true);
-    // étendre aussi l'aide existante
-    setTimeout(()=>{
-      const origHelp=cin.addEventListener;
-    },100);
   }
 
   // ═══ Filet de sécurité curseur ═══

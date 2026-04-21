@@ -68,6 +68,19 @@
     intervals.clear();
     rafs.forEach(id => origCAF(id));
     rafs.clear();
+    // Silence any lingering Tone.js audio graph: the FM drone and
+    // reverb tails will otherwise keep producing sound for seconds
+    // (or forever, in the drone's case) after the page is gone.
+    try {
+      if (typeof Tone !== 'undefined' && Tone.context) {
+        if (Tone.Destination && typeof Tone.Destination.mute === 'boolean') {
+          Tone.Destination.mute = true;
+        }
+        if (typeof Tone.context.close === 'function' && Tone.context.state !== 'closed') {
+          Tone.context.close();
+        }
+      }
+    } catch (_) { /* ignore — page is unloading */ }
   }
 
   window.addEventListener('beforeunload', cleanup);
