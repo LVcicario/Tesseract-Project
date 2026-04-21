@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 6 — Les programmes · TESSERACT.CHAIN Académie</title>
+<meta name="description" content="Sixième et dernière leçon : les smart contracts. Des programmes qui vivent sur la blockchain, s'exécutent sur tous les nœuds, consomment du gas.">
+<meta name="theme-color" content="#ff2244">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Chapitre 6 — Les programmes">
+<meta property="og:description" content="Smart contracts et mécanique du gas, visualisés en temps réel.">
+<meta property="og:type" content="article">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-page="chapter">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN — Chapitre 6</h1><p>Ce chapitre a besoin de JavaScript pour fonctionner. Activez-le, puis rechargez la page.</p></div></div></noscript>
+
+<div id="chromAb" aria-hidden="true"></div>
+<button type="button" class="vertexmark" id="vmark" aria-label="Blocs minés — cliquez pour voir vos statistiques">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span><span class="vertexmark__hint">▸ CLIC POUR DÉTAIL</span></button>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true">
+  <div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div>
+  <div id="xBody"></div>
+</aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X">
+  <button class="xclose" id="xrClose" data-hover>✕ SORTIR</button>
+  <h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3>
+  <pre id="xrDump">—</pre>
+</div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée. Tapez help pour la liste des commandes.</span></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>CH_06</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="../academy.html" data-hover>◆ ACADÉMIE</a>
+<span class="hwallet" id="hwallet" data-hover title="Votre wallet simulé — cliquez pour détails"><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section id="ch-hero">
+<div class="inner" style="--c:#ff2244">
+  <nav class="ch-crumb" aria-label="Fil d'Ariane">
+    <a href="../academy.html">Académie</a>
+    <span class="sep">/</span>
+    <span class="curr">Chapitre 6</span>
+  </nav>
+  <div class="ch-num">CHAPITRE 06 · ★★★ AVANCÉ</div>
+  <h1 class="ch-title">Les <em>programmes</em>.<br>Du code qui vit.</h1>
+  <p class="ch-lede">Jusqu'ici, la blockchain servait à échanger des jetons. Vitalik Buterin a lâché une idée en 2013 : <strong>et si la blockchain exécutait aussi du code ?</strong> Pas du code n'importe comment : du code <em>déterministe</em>, exécuté <em>par tous les nœuds en même temps</em>, et qui <em>paie pour chaque opération</em>. C'est le <span class="gloss" data-term="smart-contract">smart contract</span> — et c'est ce qui a ouvert la porte à la finance décentralisée, aux NFT, au vote on-chain, et à tout ce qui viendra ensuite.</p>
+  <div class="ch-meta"><span>Durée <strong>≈ 18 min</strong></span><span>Niveau <strong>★★★ Avancé</strong></span><span>Prérequis <strong>Chapitres 1 à 5</strong></span></div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff2244">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">01</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Raconter</div>
+      <h2 class="ch-step__t">Un ordinateur <em>partagé</em> par tout le monde.</h2>
+      <p>Un smart contract, c'est un bout de code. Comme n'importe quel programme : des variables, des fonctions, de la logique. Ce qui change, c'est <em>où</em> il tourne :</p>
+      <ul>
+        <li>Il est <strong>stocké dans un bloc</strong> (comme toute transaction).</li>
+        <li>Il est <strong>exécuté par chaque nœud du réseau</strong>, pas sur un serveur.</li>
+        <li>Son état (ses variables) est <strong>écrit dans la chaîne</strong>, et tout le monde peut le lire.</li>
+        <li>Chaque opération coûte du <span class="gloss" data-term="gas">gas</span> — payé en monnaie du réseau, prélevé sur l'utilisateur qui déclenche l'appel.</li>
+      </ul>
+      <p>Conséquences fortes : un smart contract ne peut <strong>pas mentir sur son état</strong> (tout le monde le recalcule), ne peut <strong>pas boucler à l'infini</strong> (le gas s'épuise), et ne peut <strong>pas dépendre de l'extérieur</strong> (pas d'appel réseau, pas de date système). Il doit être <strong>déterministe</strong> : même entrée, même sortie, toujours.</p>
+      <div class="ch-analogy">
+        <strong>Analogie.</strong> Un distributeur automatique. Il a une logique fixe : tu mets la somme, tu tapes le code, tu obtiens le produit. Personne ne peut demander au distributeur de « faire une exception » — il obéit à sa logique, un point c'est tout. Un smart contract, c'est un distributeur mondial, visible par tous, dont personne ne détient la clé. Une fois déployé, il est au-dessus de son créateur lui-même.
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff2244">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">02</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Montrer</div>
+      <h2 class="ch-step__t">Un <em>compteur</em> qui vit sur la chaîne.</h2>
+      <p>Ci-dessous, tu vas déployer un micro-contrat <strong>Counter</strong>. Il stocke un entier, et expose trois actions : <code>increment</code>, <code>decrement</code>, <code>reset</code>. Chaque appel consomme du gas (une sorte de carburant payé par l'appelant). Si le gas disponible tombe en-dessous du coût d'une opération, elle est <strong>rejetée</strong>.</p>
+      <p>C'est une simplification pédagogique : Ethereum utilise une VM beaucoup plus complexe (l'EVM), avec des milliers d'opcodes et un modèle économique sophistiqué. Le principe, lui, est exactement le même.</p>
+      <div class="ch-demo">
+        <div class="ch-demo-label">▸ LABORATOIRE SMART CONTRACT · COUNTER</div>
+        <div class="ch6-lab">
+          <div class="ch6-lab__col">
+            <h4>Code du contrat</h4>
+            <div class="ch6-src"><span class="kw">contract</span> <span class="fn">Counter</span> {
+  <span class="kw">int</span> count = <span class="num">0</span>;
+
+  <span class="kw">fn</span> <span class="fn">increment</span>() {     <span class="cmt">// gas: 5</span>
+    count += <span class="num">1</span>;
+  }
+
+  <span class="kw">fn</span> <span class="fn">decrement</span>() {     <span class="cmt">// gas: 5</span>
+    <span class="kw">if</span> (count &gt; <span class="num">0</span>) count -= <span class="num">1</span>;
+  }
+
+  <span class="kw">fn</span> <span class="fn">reset</span>() {         <span class="cmt">// gas: 20</span>
+    count = <span class="num">0</span>;
+  }
+
+  <span class="kw">view fn</span> <span class="fn">get</span>() {       <span class="cmt">// gas: 0 (lecture)</span>
+    <span class="kw">return</span> count;
+  }
+}</div>
+            <div class="ch6-state" aria-live="polite">
+              <div class="ch6-state__l">ÉTAT ON-CHAIN</div>
+              <div class="ch6-state__v" id="ch6Count">—</div>
+              <div class="ch6-state__gas"><span>Gas disponible</span><strong><span id="ch6Gas">0</span> / <span id="ch6GasMax">100</span></strong></div>
+              <div class="ch6-gasbar" aria-hidden="true"><div class="ch6-gasbar__fill" id="ch6GasFill"></div></div>
+            </div>
+            <div class="ch6-controls">
+              <button type="button" class="ch6-ctrl ch6-ctrl--deploy" id="ch6Deploy" data-hover>▸ Déployer le contrat</button>
+              <button type="button" class="ch6-ctrl" data-op="increment" disabled data-hover>+ increment() <span class="ch6-ctrl__cost">5 gas</span></button>
+              <button type="button" class="ch6-ctrl" data-op="decrement" disabled data-hover>− decrement() <span class="ch6-ctrl__cost">5 gas</span></button>
+              <button type="button" class="ch6-ctrl" data-op="reset" disabled data-hover>↻ reset() <span class="ch6-ctrl__cost">20 gas</span></button>
+              <button type="button" class="ch6-ctrl" data-op="get" disabled data-hover>👁 get() <span class="ch6-ctrl__cost">0 gas (lecture)</span></button>
+            </div>
+          </div>
+          <div class="ch6-lab__col">
+            <h4>Journal des transactions</h4>
+            <div class="ch6-log" id="ch6Log" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff00d4">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">03</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Faire · Défier</div>
+      <h2 class="ch-step__t"><em>Épuise</em> le gas.</h2>
+      <p>Ton défi : déployer le contrat, puis appeler <code>increment()</code> <strong>suffisamment de fois</strong> pour que l'état <code>count</code> atteigne <strong>10 ou plus</strong>. Cela va nécessiter 10 × 5 = 50 gas, sur un budget de 100 — donc largement possible sans épuiser. Mais gratte plus bas : essaie de faire déborder le gas en déclenchant <code>reset</code> après plusieurs <code>increment</code>. Observe le rejet.</p>
+      <div class="ch-chall" data-challenge="6.counter-10">
+        <div class="ch-chall__h">
+          <span class="ch-chall__k">◆ DÉFI // ATTEINDRE count ≥ 10</span>
+          <span class="ch-chall__status" id="ch6ChallStatus">EN ATTENTE</span>
+        </div>
+        <p class="ch-chall__prompt">Déploie le contrat, puis clique <code>increment()</code> au moins 10 fois. Quand l'état <code>count</code> affiche <strong>10 ou plus</strong>, le défi est validé. Tu peux aussi tester les autres opérations pour voir le gas fondre.</p>
+        <div class="ch-chall__tries"><span>Valeur actuelle <strong id="ch6CurrentVal">—</strong></span><span id="ch6Guide">Déploie le contrat pour commencer</span></div>
+        <div class="ch-chall__feedback" id="ch6ChallFeedback" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00ff88">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">05</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Retenir</div>
+      <h2 class="ch-step__t">Ce qu'il faut <em>garder</em>.</h2>
+      <div class="ch-summary">
+        <div class="ch-summary__k">◆ À RETENIR</div>
+        <ul>
+          <li>Un <strong>smart contract</strong> est un programme stocké et exécuté par la blockchain elle-même.</li>
+          <li>Il est <strong>déterministe</strong> — même entrée, même sortie, toujours — et ne peut pas dépendre de l'extérieur (pas d'API, pas d'horloge).</li>
+          <li>Chaque opération consomme du <strong>gas</strong>, payé par l'appelant. Cela empêche les boucles infinies et les attaques par spam.</li>
+          <li>Une fois déployé, un contrat est <strong>immuable</strong> — même son auteur ne peut plus le modifier, sauf s'il a prévu un mécanisme explicite de mise à jour.</li>
+          <li>Les smart contracts ont donné naissance à la <strong>DeFi</strong> (finance décentralisée), aux <strong>NFT</strong>, aux DAO, au vote on-chain. Ethereum en 2015 a été le premier écosystème à les populariser.</li>
+        </ul>
+      </div>
+
+      <div class="ch-quiz" aria-label="Quiz de fin de chapitre">
+        <div class="ch-quiz__k">◆ QUIZ // 3 QUESTIONS</div>
+
+        <div class="ch-q" data-q="1" data-correct="2">
+          <div class="ch-q__num">QUESTION 1 / 3</div>
+          <div class="ch-q__t">Pourquoi un smart contract doit-il être <strong>déterministe</strong> ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Par élégance mathématique.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Pour économiser du gas.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Parce que chaque nœud le ré-exécute indépendamment et tous doivent obtenir le même résultat.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Consensus contraint.</strong> Si le contrat faisait appel à <code>Math.random()</code> ou à l'heure système, chaque nœud obtiendrait un résultat différent et le consensus serait impossible.</div>
+        </div>
+
+        <div class="ch-q" data-q="2" data-correct="1">
+          <div class="ch-q__num">QUESTION 2 / 3</div>
+          <div class="ch-q__t">À quoi sert le <strong>gas</strong> ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>À chauffer les data centers.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>À rémunérer les nœuds et empêcher les boucles infinies.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>À protéger la clé privée.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Double rôle.</strong> Incitatif économique (les nœuds sont payés pour exécuter) et mécanisme d'arrêt (une boucle sans fin ruinerait l'appelant avant d'atteindre la fin, donc elle s'arrête).</div>
+        </div>
+
+        <div class="ch-q" data-q="3" data-correct="0">
+          <div class="ch-q__num">QUESTION 3 / 3</div>
+          <div class="ch-q__t">Quelle blockchain a popularisé les smart contracts ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Ethereum (2015).</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Bitcoin (2009).</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Solana (2020).</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Le saut.</strong> Bitcoin avait des scripts très limités (non-Turing-complets), utilisés surtout pour signer des transactions. Ethereum a ouvert la Turing-complétude via l'EVM et déclenché l'explosion DeFi / NFT / DAO qu'on connaît.</div>
+        </div>
+
+        <div class="ch-quiz__score" id="ch6QuizScore">
+          <div class="ch-quiz__score-l">Score</div>
+          <div class="ch-quiz__score-n"><span id="ch6QuizN">0</span><span style="color:var(--wk)">/3</span></div>
+          <div class="ch-quiz__score-l" id="ch6QuizMsg">—</div>
+        </div>
+      </div>
+
+      <nav class="ch-nav" aria-label="Navigation entre chapitres">
+        <a class="ch-nav__prev" href="5-consensus.html"><span class="ch-nav__k">◂ précédent</span><span class="ch-nav__t">Chapitre 5 · Le consensus</span></a>
+        <a class="ch-nav__next" href="../academy.html"><span class="ch-nav__k">fin du parcours ✓</span><span class="ch-nav__t">Retour à l'Académie</span></a>
+      </nav>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Chapitre 6 du parcours Académie — smart contracts, déterminisme et mécanique du gas, illustrés par une VM miniature visible à l'écran.</p>
+</div>
+<div class="fc"><h4>Parcours</h4><ul><li>▸ <a href="1-le-hash.html" style="color:inherit;text-decoration:none">Chapitre 1 — Le hash</a></li><li>▸ <a href="2-le-bloc.html" style="color:inherit;text-decoration:none">Chapitre 2 — Le bloc</a></li><li>▸ <a href="3-course-au-nonce.html" style="color:inherit;text-decoration:none">Chapitre 3 — La course au nonce</a></li><li>▸ <a href="4-les-identites.html" style="color:inherit;text-decoration:none">Chapitre 4 — Les identités</a></li><li>▸ <a href="5-consensus.html" style="color:inherit;text-decoration:none">Chapitre 5 — Le consensus</a></li><li>▸ <strong style="color:var(--rd)">Chapitre 6 — Les programmes</strong></li></ul></div>
+<div class="fc"><h4>Ressources</h4><ul><li>▸ Ethereum whitepaper</li><li>▸ EVM (Yellow Paper)</li><li>▸ Solidity / Vyper</li></ul></div>
+<div class="fc"><h4>Contrôles</h4><ul><li>▸ ² ou ~ : CLI</li><li>▸ clic terme souligné : glossaire</li><li>▸ Esc : fermer overlay</li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN — CHAPITRE 6 // MIT</span><span id="fcrd">CH 06/06</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="../src/lifecycle.js"></script>
+<script src="../src/ui.js"></script>
+<script src="../src/core.js"></script>
+<script src="../src/extensions.js"></script>
+<script src="../src/academy.js"></script>
+<script src="../src/chapter-6.js"></script>
+</body>
+</html>

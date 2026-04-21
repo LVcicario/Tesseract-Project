@@ -708,6 +708,43 @@ body[data-page="academy"] #boot,body[data-page="academy"] .shint{display:none!im
 .ch5-net__quorum button.active{border-color:var(--cy);background:rgba(0,240,255,.1);color:var(--cy)}
 .ch5-net__quorum button:hover:not(.active){border-color:var(--cy);color:var(--cy)}
 
+/* Chapter 6 — smart contract VM */
+.ch6-lab{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+@media(max-width:720px){.ch6-lab{grid-template-columns:1fr}}
+.ch6-lab__col{background:#000;border:1px solid var(--b);padding:18px;font-family:var(--m);font-size:11px}
+.ch6-lab__col h4{font-size:10px;letter-spacing:.28em;color:var(--rd);margin:0 0 12px;text-transform:uppercase;font-weight:700}
+.ch6-src{background:rgba(255,255,255,.02);border:1px dashed var(--b);padding:14px;font-family:var(--m);font-size:11px;color:var(--d);line-height:1.6;white-space:pre-wrap;word-break:break-word;min-height:110px}
+.ch6-src .kw{color:var(--mg)}
+.ch6-src .fn{color:var(--cy)}
+.ch6-src .num{color:var(--gd)}
+.ch6-src .cmt{color:var(--wk);font-style:italic}
+
+.ch6-state{margin-top:12px;padding:12px;background:#000;border:1px solid var(--b)}
+.ch6-state__l{font-family:var(--m);font-size:9px;letter-spacing:.25em;color:var(--wk);text-transform:uppercase;margin-bottom:6px}
+.ch6-state__v{font-family:var(--dp);font-size:32px;color:var(--gd);font-variant-numeric:tabular-nums;margin:0}
+.ch6-state__gas{display:flex;justify-content:space-between;margin-top:12px;font-family:var(--m);font-size:11px;color:var(--d)}
+.ch6-state__gas strong{color:var(--cy);font-variant-numeric:tabular-nums}
+.ch6-gasbar{width:100%;height:6px;background:rgba(139,92,246,.12);margin-top:8px;position:relative;overflow:hidden}
+.ch6-gasbar__fill{position:absolute;inset:0;width:100%;background:linear-gradient(90deg,var(--cy),var(--mg));transition:width .4s}
+.ch6-gasbar__fill.low{background:var(--rd)}
+
+.ch6-controls{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.ch6-ctrl{font-family:var(--m);font-size:11px;letter-spacing:.25em;padding:11px 14px;background:transparent;border:1px solid var(--b);color:var(--d);cursor:none;text-transform:uppercase;transition:all .2s;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ch6-ctrl:hover:not(:disabled),.ch6-ctrl:focus-visible{border-color:var(--mg);color:var(--mg);outline:none}
+.ch6-ctrl:disabled{opacity:.45;cursor:not-allowed}
+.ch6-ctrl__cost{color:var(--vi);font-size:10px}
+.ch6-ctrl--deploy{border-color:var(--cy);color:var(--cy)}
+.ch6-ctrl--deploy:hover:not(:disabled){background:var(--cy);color:#000}
+
+.ch6-log{max-height:260px;overflow-y:auto;font-family:var(--m);font-size:11px;color:var(--d);line-height:1.55;padding-right:4px}
+.ch6-log::-webkit-scrollbar{width:3px}
+.ch6-log::-webkit-scrollbar-thumb{background:var(--vi)}
+.ch6-log__line{padding:4px 0;border-bottom:1px dashed var(--b)}
+.ch6-log__line:last-child{border-bottom:none}
+.ch6-log__line.ok{color:var(--gr)}
+.ch6-log__line.ko{color:var(--rd)}
+.ch6-log__line .ts{color:var(--wk);font-size:10px;margin-right:8px}
+
 /* ═══ v2.2 — Glossaire flottant ═══ */
 .gloss{border-bottom:1px dashed rgba(0,240,255,.55);cursor:none;color:inherit;transition:color .18s}
 .gloss:hover,.gloss:focus-visible{color:var(--cy);outline:none}
