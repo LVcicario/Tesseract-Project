@@ -265,7 +265,13 @@ section{padding:100px 18px}
 .fi{grid-template-columns:1fr 1fr;gap:30px}
 .fb{flex-direction:column;gap:10px}
 .rb,.mb,.hb{cursor:pointer}
-.dhint{display:none}}
+.dhint{display:none}
+/* Apple/WCAG touch target minimum ≈ 44 px on mobile */
+.hb,.hb--nav,.hwallet,.rb,.ch-nav a,.ch5-net__btn,.ch6-ctrl,.diff-opt,.ch3-mine__diff button,.ch5-node__toggle,.tsc-modal__btn,.tsc-modal__close,.xh-c,.xclose{min-height:44px;display:inline-flex;align-items:center}
+.hb,.hb--nav{padding:10px 14px}
+.hwallet{padding:8px 14px}
+.ay-progress__reset,.hashlab-reset,.lboard-h button{min-height:36px}
+}
 
 /* v2.0 — accessibilité & résilience mobile (additif, ne remplace rien) */
 @media (prefers-reduced-motion: reduce){

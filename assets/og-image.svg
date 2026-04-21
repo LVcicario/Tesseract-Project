@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0a0f22"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+    <linearGradient id="title" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8ecff"/>
+      <stop offset="30%" stop-color="#e8ecff"/>
+      <stop offset="70%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#8b5cf6" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <g transform="translate(820, 315)" fill="none" stroke="#00f0ff" stroke-width="1.5" filter="url(#glow)" opacity="0.85">
+    <rect x="-110" y="-110" width="220" height="220"/>
+    <rect x="-60" y="-60" width="220" height="220" stroke="#ff00d4"/>
+    <line x1="-110" y1="-110" x2="-60" y2="-60" stroke="#8b5cf6"/>
+    <line x1="110" y1="-110" x2="160" y2="-60" stroke="#8b5cf6"/>
+    <line x1="-110" y1="110" x2="-60" y2="160" stroke="#8b5cf6"/>
+    <line x1="110" y1="110" x2="160" y2="160" stroke="#8b5cf6"/>
+  </g>
+
+  <g font-family="Impact, 'Arial Narrow Bold', sans-serif" fill="url(#title)">
+    <text x="80" y="230" font-size="128" font-weight="900" letter-spacing="-3">TESSERACT</text>
+    <text x="80" y="350" font-size="128" font-weight="900" letter-spacing="-3">.CHAIN</text>
+  </g>
+
+  <text x="80" y="430" font-family="ui-monospace, monospace" font-size="22" fill="#00f0ff" letter-spacing="6">
+    ◆ BLOCKCHAIN 3.0 · PROJETÉE DEPUIS LA 4ᵉ DIMENSION
+  </text>
+
+  <text x="80" y="490" font-family="ui-sans-serif, -apple-system, sans-serif" font-size="26" fill="#a6aecc" font-weight="300">
+    Minage SHA-256 réel · Smart contracts · Parcours
+  </text>
+  <text x="80" y="526" font-family="ui-sans-serif, -apple-system, sans-serif" font-size="26" fill="#a6aecc" font-weight="300">
+    interactif en six chapitres pour comprendre.
+  </text>
+
+  <g transform="translate(80, 580)" font-family="ui-monospace, monospace" font-size="14" fill="#5a6488" letter-spacing="3">
+    <text>◆ HASH · ◆ BLOC · ◆ PoW · ◆ IDENTITÉS · ◆ CONSENSUS · ◆ SMART CONTRACTS</text>
+  </g>
+</svg>
