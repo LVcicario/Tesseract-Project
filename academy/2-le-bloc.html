@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 2 — Le bloc · TESSERACT.CHAIN Académie</title>
+<meta name="description" content="Deuxième leçon : comment les blocs se chaînent par leur hash et pourquoi modifier le passé devient pratiquement impossible.">
+<meta name="theme-color" content="#ff00d4">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Chapitre 2 — Le bloc · TESSERACT.CHAIN Académie">
+<meta property="og:description" content="Pourquoi chaîner les blocs rend la falsification pratiquement impossible.">
+<meta property="og:type" content="article">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-page="chapter">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN — Chapitre 2</h1><p>Ce chapitre a besoin de JavaScript pour fonctionner. Activez-le, puis rechargez la page.</p></div></div></noscript>
+
+<div id="chromAb" aria-hidden="true"></div>
+<button type="button" class="vertexmark" id="vmark" aria-label="Blocs minés — cliquez pour voir vos statistiques">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span><span class="vertexmark__hint">▸ CLIC POUR DÉTAIL</span></button>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true">
+  <div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div>
+  <div id="xBody"></div>
+</aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X">
+  <button class="xclose" id="xrClose" data-hover>✕ SORTIR</button>
+  <h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3>
+  <pre id="xrDump">—</pre>
+</div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée. Tapez help pour la liste des commandes.</span></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>CH_02</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="../academy.html" data-hover>◆ ACADÉMIE</a>
+<span class="hwallet" id="hwallet" data-hover title="Votre wallet simulé — cliquez pour détails"><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section id="ch-hero">
+<div class="inner" style="--c:#ff00d4">
+  <nav class="ch-crumb" aria-label="Fil d'Ariane">
+    <a href="../academy.html">Académie</a>
+    <span class="sep">/</span>
+    <span class="curr">Chapitre 2</span>
+  </nav>
+  <div class="ch-num">CHAPITRE 02 · ★ DÉBUTANT</div>
+  <h1 class="ch-title">Le <em>bloc</em>.<br>Un maillon qui ne peut pas mentir.</h1>
+  <p class="ch-lede">Au chapitre précédent, tu as vu que le hash agit comme une empreinte. Maintenant on empile des blocs, on insère le hash du bloc précédent <strong>à l'intérieur</strong> du suivant, et quelque chose d'étonnant se produit : <strong>modifier un bloc du passé devient pratiquement impossible</strong> sans modifier tout ce qui suit. C'est ça, une blockchain.</p>
+  <div class="ch-meta"><span>Durée <strong>≈ 12 min</strong></span><span>Niveau <strong>★ Débutant</strong></span><span>Prérequis <strong>Chapitre 1</strong></span></div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff00d4">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">01</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Raconter</div>
+      <h2 class="ch-step__t">Un <em>livre</em> où chaque page pointe vers la précédente.</h2>
+      <p>Imagine un gros livre comptable. Chaque page raconte les transactions du moment : <em>Alice donne 10 à Bob</em>, <em>Bob donne 3 à Carol</em>. À la fin de chaque page, on écrit <strong>l'empreinte (hash) de la page précédente</strong>. Cette page devient un <span class="gloss" data-term="bloc">bloc</span>.</p>
+      <p>Maintenant, quelqu'un veut tricher : il raye une transaction d'une page plus ancienne. Problème : le hash de cette page change. Donc la page suivante, qui référence ce hash, devient incohérente. Il faut la corriger elle aussi. Ce qui change <em>son</em> hash à elle. Et ainsi de suite jusqu'à la dernière page.</p>
+      <div class="ch-analogy">
+        <strong>Analogie.</strong> C'est comme si chaque tampon officiel contenait le tampon de la veille. Falsifier un tampon d'il y a dix ans obligerait à refaire tous les tampons suivants, tous datés, tous signés par des gens différents. <strong>Impossible à faire discrètement.</strong>
+      </div>
+      <p>La blockchain ajoute une dernière couche : le livre n'est pas tenu par une seule personne. Il est <strong>recopié sur des milliers de machines</strong> en même temps. Pour que ta version falsifiée soit crue, il faudrait la diffuser à tout le monde <em>plus vite</em> que la version honnête. On verra comment au chapitre 3.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff00d4">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">02</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Montrer</div>
+      <h2 class="ch-step__t">Quatre blocs. Un lien qui se casse.</h2>
+      <p>Voici quatre blocs fraîchement chaînés. Le <strong>bloc #000</strong> est le <span class="gloss" data-term="bloc">bloc genèse</span> (le premier, qui ne référence rien). Les suivants contiennent chacun le hash du précédent dans leur champ <code>prev</code>. Tant que toutes les empreintes concordent, la chaîne est <strong style="color:var(--gr)">valide</strong> (bord vert).</p>
+      <p>Le <strong>bloc #001</strong> est modifiable. Essaie : change ce qu'il contient. Observe ce qui se passe pour les blocs suivants.</p>
+      <div class="ch-demo">
+        <div class="ch-demo-label">▸ CHAÎNE INTERACTIVE · 4 BLOCS</div>
+        <div class="ch2-chain" id="ch2Chain" aria-label="Chaîne de quatre blocs interactive"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff00d4">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">03</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Faire</div>
+      <h2 class="ch-step__t">Tu veux <em>réparer</em> ? Coûte cher.</h2>
+      <p>Tu viens de modifier le bloc #001. Les blocs #002, #003 sont désormais <strong style="color:var(--rd)">invalides</strong> : ils contiennent un <code>prev</code> qui ne correspond plus au vrai hash du bloc #001.</p>
+      <p>Pour réparer la chaîne, tu dois <strong>re-calculer le hash</strong> de chaque bloc, un par un, dans l'ordre. Utilise le bouton <strong>Propager le hash</strong> sur chaque bloc invalide. Tu vas sentir que chaque réparation ne règle <em>qu'un maillon</em> — et la rupture se propage toujours en aval.</p>
+      <p>Sur une vraie blockchain, chaque « réparation » coûte le même effort que miner un bloc neuf. Et pendant que tu répares dix blocs, le reste du réseau en a déjà miné cinquante autres. <strong>Tu ne rattrapes jamais.</strong></p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff00d4">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">04</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Défier</div>
+      <h2 class="ch-step__t">Remets la chaîne <em>en ordre</em>.</h2>
+      <p>Ton défi : modifier le bloc #001, puis <strong>restaurer la chaîne entière</strong> en propageant les hashes jusqu'au bloc #003. Quand tous les blocs sont de nouveau verts, le défi est validé.</p>
+      <div class="ch-chall" data-challenge="2.repair-chain">
+        <div class="ch-chall__h">
+          <span class="ch-chall__k">◆ DÉFI // RÉPARER LA CASCADE</span>
+          <span class="ch-chall__status" id="ch2ChallStatus">EN ATTENTE</span>
+        </div>
+        <p class="ch-chall__prompt">Étapes : <strong>(1)</strong> change les données du bloc #001 dans la chaîne ci-dessus, <strong>(2)</strong> clique « propager » sur le bloc #001 pour actualiser son hash, <strong>(3)</strong> puis sur le bloc #002 (qui référence le #001), <strong>(4)</strong> puis le #003. La chaîne doit redevenir entièrement verte.</p>
+        <div class="ch-chall__tries"><span>Blocs valides <strong id="ch2Valid">4</strong> / 4</span><span id="ch2Guide">Modifie d'abord le bloc #001 pour démarrer</span></div>
+        <div class="ch-chall__feedback" id="ch2ChallFeedback" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00ff88">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">05</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Retenir</div>
+      <h2 class="ch-step__t">Ce qu'il faut <em>garder</em>.</h2>
+      <div class="ch-summary">
+        <div class="ch-summary__k">◆ À RETENIR</div>
+        <ul>
+          <li>Un <strong>bloc</strong> contient des données, le hash du bloc précédent, et son propre hash.</li>
+          <li>Cette référence au précédent crée la <strong>« chaîne »</strong> : une suite où chaque maillon dépend du précédent.</li>
+          <li>Modifier un bloc du passé invalide <strong>tous les blocs suivants</strong> par effet de cascade.</li>
+          <li>Le premier bloc (#000) s'appelle le <strong>bloc genèse</strong>. Il est codé en dur dans le protocole et ne référence aucun prédécesseur.</li>
+          <li>Sur une vraie blockchain, réparer la cascade est prohibitivement cher — c'est ce qui rend le passé <strong>pratiquement immuable</strong>.</li>
+        </ul>
+      </div>
+      <div class="ch-quiz" aria-label="Quiz de fin de chapitre">
+        <div class="ch-quiz__k">◆ QUIZ // 3 QUESTIONS</div>
+
+        <div class="ch-q" data-q="1" data-correct="1">
+          <div class="ch-q__num">QUESTION 1 / 3</div>
+          <div class="ch-q__t">Pourquoi appelle-t-on une blockchain une « <strong>chaîne</strong> » ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Parce que les blocs sont lourds à stocker.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Parce que chaque bloc contient le hash du précédent.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Parce que c'est une liste chaînée en mémoire.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Le lien est sémantique, pas technique.</strong> Le chaînage par hash est une preuve cryptographique d'ordre. N'importe quelle structure peut le stocker (fichier, base de données, arbre) — l'essence reste la référence au précédent.</div>
+        </div>
+
+        <div class="ch-q" data-q="2" data-correct="2">
+          <div class="ch-q__num">QUESTION 2 / 3</div>
+          <div class="ch-q__t">Si je modifie <strong>un seul bloc au milieu</strong> de la chaîne, que se passe-t-il ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Seul ce bloc devient invalide.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Toute la chaîne <em>avant</em> ce bloc devient invalide.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Tous les blocs <em>suivants</em> deviennent invalides.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>La cascade va toujours dans le sens du temps.</strong> Modifier un bloc change son hash ; le bloc suivant contient l'ancien hash dans son champ <code>prev</code>, et se retrouve donc incohérent. L'onde se propage vers l'avenir, jamais vers le passé.</div>
+        </div>
+
+        <div class="ch-q" data-q="3" data-correct="1">
+          <div class="ch-q__num">QUESTION 3 / 3</div>
+          <div class="ch-q__t">Comment s'appelle le <strong>premier bloc</strong> d'une blockchain ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Le bloc alpha.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Le bloc genèse (<em>genesis block</em>).</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Le bloc racine.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Origines.</strong> Le terme <em>genesis block</em> vient de Bitcoin. Satoshi y a inscrit un message à la une du Times du 3 janvier 2009 — preuve qu'il n'a pas pré-miné la chaîne avant cette date.</div>
+        </div>
+
+        <div class="ch-quiz__score" id="ch2QuizScore">
+          <div class="ch-quiz__score-l">Score</div>
+          <div class="ch-quiz__score-n"><span id="ch2QuizN">0</span><span style="color:var(--wk)">/3</span></div>
+          <div class="ch-quiz__score-l" id="ch2QuizMsg">—</div>
+        </div>
+      </div>
+
+      <nav class="ch-nav" aria-label="Navigation entre chapitres">
+        <a class="ch-nav__prev" href="1-le-hash.html"><span class="ch-nav__k">◂ précédent</span><span class="ch-nav__t">Chapitre 1 · Le hash</span></a>
+        <span class="ch-nav__next ch-nav__locked"><span class="ch-nav__k">suivant ▸</span><span class="ch-nav__t">Chapitre 3 · bientôt</span></span>
+      </nav>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Chapitre 2 du parcours Académie — le chaînage des blocs et la propriété d'immuabilité par cascade.</p>
+</div>
+<div class="fc"><h4>Parcours</h4><ul><li>▸ <a href="1-le-hash.html" style="color:inherit;text-decoration:none">Chapitre 1 — Le hash</a></li><li>▸ <strong style="color:var(--mg)">Chapitre 2 — Le bloc</strong></li><li>▸ Chapitre 3 — La course au nonce</li><li>▸ Chapitre 4 — Les identités</li><li>▸ Chapitre 5 — Le consensus</li><li>▸ Chapitre 6 — Les programmes</li></ul></div>
+<div class="fc"><h4>Ressources</h4><ul><li>▸ Bitcoin whitepaper §3</li><li>▸ Merkle trees</li><li>▸ Linked hash lists</li></ul></div>
+<div class="fc"><h4>Contrôles</h4><ul><li>▸ ² ou ~ : CLI</li><li>▸ clic terme souligné : glossaire</li><li>▸ Esc : fermer overlay</li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN — CHAPITRE 2 // MIT</span><span id="fcrd">CH 02/06</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="../src/lifecycle.js"></script>
+<script src="../src/ui.js"></script>
+<script src="../src/core.js"></script>
+<script src="../src/extensions.js"></script>
+<script src="../src/academy.js"></script>
+<script src="../src/chapter-2.js"></script>
+</body>
+</html>

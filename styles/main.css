@@ -591,6 +591,32 @@ body[data-page="academy"] #boot,body[data-page="academy"] .shint{display:none!im
   .ch-nav{grid-template-columns:1fr;gap:12px}
 }
 
+/* Chapter 2 — interactive chain repair */
+.ch2-chain{display:grid;gap:14px;margin-top:8px}
+.ch2-blk{padding:20px 22px;background:#000;border:1px solid rgba(0,255,136,.35);font-family:var(--m);position:relative;transition:border-color .35s,background .35s}
+.ch2-blk.invalid{border-color:var(--rd);background:rgba(255,34,68,.04)}
+.ch2-blk.source{border-color:var(--gd);background:rgba(255,204,61,.06);box-shadow:0 0 24px rgba(255,204,61,.18)}
+.ch2-blk__h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:10px;letter-spacing:.25em;text-transform:uppercase}
+.ch2-blk__idx{color:var(--gr);font-weight:700}
+.ch2-blk.invalid .ch2-blk__idx{color:var(--rd)}
+.ch2-blk.source .ch2-blk__idx{color:var(--gd)}
+.ch2-blk__st{padding:3px 10px;border:1px solid currentColor;font-size:9px;letter-spacing:.22em}
+.ch2-blk__l{color:var(--wk);font-size:9px;letter-spacing:.22em;text-transform:uppercase;margin-top:10px;margin-bottom:4px}
+.ch2-blk__v{color:var(--w);font-size:12px;word-break:break-all;line-height:1.5}
+.ch2-blk__hash{color:var(--cy);font-size:11px;word-break:break-all;line-height:1.55}
+.ch2-blk.invalid .ch2-blk__hash{color:var(--rd)}
+.ch2-blk.source .ch2-blk__hash{color:var(--gd)}
+.ch2-blk__edit{width:100%;background:#000;border:1px solid var(--gd);color:var(--w);font-family:inherit;font-size:13px;padding:8px 10px;outline:none}
+.ch2-blk__edit:focus,.ch2-blk__edit:focus-visible{border-color:var(--cy);box-shadow:0 0 0 2px rgba(0,240,255,.2);outline:none}
+.ch2-blk__action{margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ch2-blk__btn{font-family:var(--m);font-size:10px;letter-spacing:.25em;padding:8px 14px;background:transparent;border:1px solid var(--b);color:var(--d);cursor:none;text-transform:uppercase;transition:all .2s}
+.ch2-blk__btn:hover:not(:disabled),.ch2-blk__btn:focus-visible{border-color:var(--cy);color:var(--cy);outline:none}
+.ch2-blk__btn.primary{border-color:var(--mg);color:var(--mg)}
+.ch2-blk__btn.primary:hover:not(:disabled),.ch2-blk__btn.primary:focus-visible{background:var(--mg);color:#000}
+.ch2-blk__btn:disabled{opacity:.4;cursor:not-allowed}
+.ch2-blk__warn{font-size:10px;color:var(--rd);letter-spacing:.1em}
+.ch2-blk.source .ch2-blk__warn{color:var(--gd)}
+
 /* ═══ v2.2 — Glossaire flottant ═══ */
 .gloss{border-bottom:1px dashed rgba(0,240,255,.55);cursor:none;color:inherit;transition:color .18s}
 .gloss:hover,.gloss:focus-visible{color:var(--cy);outline:none}
