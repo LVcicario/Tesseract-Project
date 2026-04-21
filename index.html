@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TESSERACT.CHAIN — Blockchain 3.0, projetée depuis la 4ᵉ dimension</title>
+<meta name="description" content="Exploration interactive de la Blockchain 3.0 via un tesseract 4D. Minage SHA-256 réel, cascade d'invalidation, simulation temps réel.">
+<meta name="theme-color" content="#00f0ff">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="TESSERACT.CHAIN">
+<meta property="og:description" content="Blockchain 3.0 projetée depuis la 4ᵉ dimension — simulation interactive.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN</h1><p>Cette projection a besoin de JavaScript pour déplier sa 4ᵉ dimension. Activez-le, puis rechargez la page.</p></div></div></noscript>
+
+<!-- v2.1 overlays -->
+<div id="chromAb" aria-hidden="true"></div>
+<div class="vertexmark" id="vmark">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots"></span></div>
+<aside id="explorer" aria-label="Explorateur de bloc">
+  <div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div>
+  <div id="xBody"></div>
+</aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X">
+  <button class="xclose" id="xrClose" data-hover>✕ SORTIR</button>
+  <h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3>
+  <pre id="xrDump">—</pre>
+</div>
+
+<div id="boot">
+<div class="scan"></div><div class="crt"></div>
+<div class="boot-head"><span>TESSERACT OS // v3.0.1</span><span id="bootTime">--:--:--</span></div>
+<div id="bootLog"></div>
+</div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><span class="cp">tesseract@chain:~$</span><input class="cin" id="cin" autocomplete="off" spellcheck="false"></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>NET_ACTIVE</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<span class="hwallet" id="hwallet" data-hover title="Votre wallet simulé — cliquez pour détails"><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<div class="dhint">▸ <strong>GLISSEZ</strong> POUR TOURNER // <strong>SHIFT</strong> POUR LA 4ᵉ DIMENSION</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section id="hero">
+<div class="inner">
+<div class="hk">// BLOCKCHAIN 3.0 // SIMULATION INTERACTIVE</div>
+<h1 class="ht" id="ht"></h1>
+<p class="hs">La troisième génération de blockchain n'ajoute pas une dimension —<br><em>elle en ajoute quatre.</em></p>
+<div class="netstrip" role="status" aria-live="polite">
+  <span><span class="pulse"></span>RÉSEAU <strong id="ns-status">ACTIF</strong></span>
+  <span>BLOCS GLOBAUX <strong id="ns-blocks">0</strong></span>
+  <span>LATENCE <strong id="ns-lat">0</strong> ms</span>
+  <span>NŒUDS <strong id="ns-nodes">256</strong></span>
+</div>
+</div>
+<div class="shint">DESCENDRE // 4ᵉ DIMENSION</div>
+</section>
+
+<section id="concept">
+<div class="inner">
+<div class="sl rv">CONCEPT // 001</div>
+<h2 class="st rv scr">Le cube qui <em>contient</em><br>un autre cube.</h2>
+<div class="gd">
+<div class="rv">
+<div class="qb">
+<div class="qt">Un tesseract est à un cube ce que <mark>Blockchain&nbsp;3.0</mark> est à ses ancêtres : l'enveloppe d'une réalité plus vaste.</div>
+<div class="qm">▸ AXIOME.001 — PROJECTION THÉORIQUE</div>
+</div>
+</div>
+<div class="ct rv">
+<p>La Blockchain 1.0 a créé la <strong>valeur numérique</strong>. La 2.0 a ajouté la <strong>logique programmable</strong>. La 3.0 les déplie dans un espace à quatre axes où chacun influence tous les autres.</p>
+<p>Scalabilité, interopérabilité, durabilité, applications réelles : les quatre dimensions d'un même hypercube. Quand l'un tourne, les trois autres bougent avec lui.</p>
+<div class="cn">// <em>Ce que vous voyez en arrière-plan</em> n'est pas un cube en rotation. C'est un <em>tesseract</em>, projeté depuis la 4D. <strong style="color:var(--cy)">Glissez-le avec la souris. Maintenez SHIFT pour faire tourner sa 4ᵉ dimension.</strong></div>
+<div class="d1234" aria-label="Progression dimensionnelle 1D à 4D">
+  <div>
+    <svg viewBox="0 0 60 60"><line x1="8" y1="30" x2="52" y2="30" stroke="#00f0ff"/><circle cx="8" cy="30" r="3" fill="#00f0ff"/><circle cx="52" cy="30" r="3" fill="#00f0ff"/></svg>
+    <div class="d-lbl">1D</div><div class="d-sub">segment</div>
+  </div>
+  <div>
+    <svg viewBox="0 0 60 60"><rect x="14" y="14" width="32" height="32" stroke="#00f0ff"/></svg>
+    <div class="d-lbl">2D</div><div class="d-sub">carré</div>
+  </div>
+  <div>
+    <svg viewBox="0 0 60 60"><rect x="10" y="18" width="28" height="28" stroke="#8b5cf6"/><rect x="22" y="10" width="28" height="28" stroke="#8b5cf6"/><line x1="10" y1="18" x2="22" y2="10" stroke="#8b5cf6"/><line x1="38" y1="18" x2="50" y2="10" stroke="#8b5cf6"/><line x1="10" y1="46" x2="22" y2="38" stroke="#8b5cf6"/><line x1="38" y1="46" x2="50" y2="38" stroke="#8b5cf6"/></svg>
+    <div class="d-lbl">3D</div><div class="d-sub">cube</div>
+  </div>
+  <div>
+    <svg viewBox="0 0 60 60"><rect x="8" y="8" width="30" height="30" stroke="#ff00d4"/><rect x="22" y="22" width="30" height="30" stroke="#ff00d4"/><line x1="8" y1="8" x2="22" y2="22" stroke="#ff00d4"/><line x1="38" y1="8" x2="52" y2="22" stroke="#ff00d4"/><line x1="8" y1="38" x2="22" y2="52" stroke="#ff00d4"/><line x1="38" y1="38" x2="52" y2="52" stroke="#ff00d4"/></svg>
+    <div class="d-lbl" style="color:var(--mg)">4D</div><div class="d-sub">tesseract</div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="dimensions">
+<div class="inner">
+<div class="sl rv">LES QUATRE AXES // 002</div>
+<h2 class="st rv scr">Quatre dimensions.<br><em>Une seule chaîne.</em></h2>
+<p class="si rv">Chaque sommet du tesseract connecte quatre arêtes — quatre piliers sur lesquels repose l'infrastructure de la Blockchain 3.0. Retirez-en un, et la structure entière s'effondre.</p>
+<div class="dg rv">
+<div class="dc" style="--c:#00f0ff" data-hover>
+<div class="dn">AXE_01 / X</div>
+<svg class="di" viewBox="0 0 60 60"><path d="M10 30 L30 10 L50 30 L30 50 Z"/><path d="M10 30 L50 30 M30 10 L30 50"/><circle cx="30" cy="30" r="3" fill="#00f0ff"/></svg>
+<h3 class="dt">SCALABILITÉ</h3>
+<p class="dd">Sharding, DAG (Directed Acyclic Graphs), consensus parallèles. Là où Bitcoin plafonnait à 7 transactions par seconde, la 3.0 vise le million — sans sacrifier la décentralisation.</p>
+<div class="ds"><span>TPS CIBLE</span><strong>&gt; 1 000 000</strong></div>
+</div>
+<div class="dc" style="--c:#ff00d4" data-hover>
+<div class="dn">AXE_02 / Y</div>
+<svg class="di" viewBox="0 0 60 60"><circle cx="20" cy="30" r="10"/><circle cx="40" cy="30" r="10"/><path d="M30 20 L30 40 M10 30 L50 30"/></svg>
+<h3 class="dt">INTEROPÉRABILITÉ</h3>
+<p class="dd">Les chaînes dialoguent. Ponts cryptographiques, protocoles IBC, communication inter-chaînes : la donnée et la valeur circulent librement entre écosystèmes autrefois isolés.</p>
+<div class="ds"><span>PROTOCOLES</span><strong>N × N</strong></div>
+</div>
+<div class="dc" style="--c:#8b5cf6" data-hover>
+<div class="dn">AXE_03 / Z</div>
+<svg class="di" viewBox="0 0 60 60"><path d="M30 5 L30 55"/><path d="M15 20 Q30 15 45 20 M15 35 Q30 30 45 35 M15 50 Q30 45 45 50"/><circle cx="30" cy="30" r="2.5" fill="#8b5cf6"/></svg>
+<h3 class="dt">DURABILITÉ</h3>
+<p class="dd">Fin du Proof-of-Work énergivore. Proof-of-Stake, Proof-of-Authority, consensus à faible empreinte. Une transaction 3.0 consomme moins qu'une recherche web.</p>
+<div class="ds"><span>ÉNERGIE vs 1.0</span><strong>−99,95%</strong></div>
+</div>
+<div class="dc" style="--c:#ffcc3d" data-hover>
+<div class="dn">AXE_04 / W</div>
+<svg class="di" viewBox="0 0 60 60"><rect x="10" y="15" width="40" height="30" rx="2"/><path d="M10 25 L50 25"/><circle cx="17" cy="20" r="1.5" fill="#ffcc3d"/><circle cx="22" cy="20" r="1.5" fill="#ffcc3d"/><path d="M20 35 L30 35 M20 40 L40 40"/></svg>
+<h3 class="dt">APPLICATIONS RÉELLES</h3>
+<p class="dd">Au-delà de la finance : santé (dossiers patients), logistique (traçabilité), vote (transparence), identité souveraine, tokenisation d'actifs. La 4ᵉ dimension, c'est l'usage.</p>
+<div class="ds"><span>SECTEURS</span><strong>15+ VERTICALES</strong></div>
+</div>
+</div>
+<div class="srcnote rv">
+  <strong>Ordres de grandeur</strong> — TPS cible (<em>sharding + DAG</em>) : projections Polkadot, Solana, Aptos. Réduction énergétique (<em>PoS vs PoW</em>) : Ethereum Foundation, rapport <code>The Merge</code> (2022), −99,95 %. Interopérabilité <em>N×N</em> : IBC (Cosmos), XCM (Polkadot). Chiffres indicatifs à fin 2025, susceptibles d'évoluer.
+</div>
+</div>
+</section>
+
+<section id="timeline">
+<div class="inner">
+<div class="sl rv">CHRONOLOGIE // 003</div>
+<h2 class="st rv scr">De la valeur à <em>l'écosystème</em>.</h2>
+<p class="si rv">Quinze années. Trois générations. Un basculement paradigmatique à chaque fois.</p>
+<div class="tl rv">
+<div class="tlt"></div>
+<div class="tli tli4">
+<div class="tit" style="--tc:#8b5cf6" data-hover>
+<div class="tnd"></div>
+<div class="ty">2009 — LE COMMENCEMENT</div>
+<div class="tv">BLOCKCHAIN 1.0</div>
+<p class="td">Bitcoin. La preuve qu'un réseau peut s'accorder sur la vérité sans tiers de confiance. La blockchain, à ce stade, ne sait faire qu'une chose — mais elle la fait pour toujours.</p>
+<div class="tgs"><span class="tg">BITCOIN</span><span class="tg">PoW</span><span class="tg">VALEUR</span></div>
+</div>
+<div class="tit" style="--tc:#00f0ff" data-hover>
+<div class="tnd"></div>
+<div class="ty">2015 — LA PROGRAMMABILITÉ</div>
+<div class="tv">BLOCKCHAIN 2.0</div>
+<p class="td">Ethereum inaugure les smart contracts. La blockchain devient un ordinateur mondial. DApps, DeFi, NFT, DAO — l'explosion combinatoire du Turing-complet décentralisé.</p>
+<div class="tgs"><span class="tg">ETHEREUM</span><span class="tg">SMART</span><span class="tg">DAPPS</span></div>
+</div>
+<div class="tit" style="--tc:#ff00d4" data-hover>
+<div class="tnd"></div>
+<div class="ty">2020+ — LA MATURITÉ</div>
+<div class="tv">BLOCKCHAIN 3.0</div>
+<p class="td">Polkadot, Cosmos, Solana, Avalanche. Interconnexion, scaling, durabilité, usages non-financiers. La blockchain cesse d'être une technologie : elle devient une infrastructure.</p>
+<div class="tgs"><span class="tg">INTEROP</span><span class="tg">DAG</span><span class="tg">PoS</span><span class="tg">IoT</span></div>
+</div>
+<div class="tit proj" style="--tc:#ffcc3d" data-hover>
+<div class="tnd"></div>
+<div class="ty">2030+ — PROJECTION</div>
+<div class="tv">BLOCKCHAIN 4.0<span style="color:var(--gd);margin-left:8px">?</span></div>
+<p class="td">Convergence IA × blockchain, identité souveraine par défaut, tokenisation du réel, infrastructures auto-gouvernées. La 4ᵉ dimension cesse d'être une métaphore : elle devient l'interface.</p>
+<div class="tgs"><span class="tg">AI×CHAIN</span><span class="tg">SSI</span><span class="tg">RWA</span><span class="tg">?</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="simulation">
+<div class="inner">
+<div class="sl rv">FLUX TEMPS RÉEL // 004</div>
+<h2 class="st rv scr">La chaîne vit.<br><em>En ce moment.</em></h2>
+<p class="si rv">Le réseau génère des blocs en continu avec des <strong>hashs SHA-256 réels</strong>. Chaque nouveau bloc illumine un sommet spécifique du tesseract — <strong>la chaîne EST le tesseract</strong>.</p>
+<div class="sw rv">
+<div class="sh">
+<div class="ss"><div class="hd"></div><span>RÉSEAU EN LIGNE // VALIDATION AUTOMATIQUE</span></div>
+<div class="sm"><span>BLOCKS <strong id="sbk">0</strong></span><span>TX <strong id="stx">0</strong></span><span>HASH/s <strong id="srt">0</strong></span></div>
+</div>
+<div class="cv"><div class="cth" id="cth"></div></div>
+<div class="mempool">
+  <div class="mempool-h"><span>▸ MEMPOOL // TRANSACTIONS EN ATTENTE</span><span>PENDING <strong id="mpCount">0</strong></span></div>
+  <div class="mempool-list" id="mpList"></div>
+  <div class="spark" id="spark" aria-label="Graphique TPS"></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="tamper">
+<div class="inner">
+<div class="sl rv">TEST D'INTÉGRITÉ // 005</div>
+<h2 class="st rv scr">Modifiez un bloc.<br><em>Regardez la chaîne se briser.</em></h2>
+<p class="si rv">Chaque bloc contient le hash du précédent. Altérez une donnée, son hash change — tous les blocs suivants deviennent invalides. <strong style="color:var(--rd)">Avertissement : le tesseract va réagir.</strong></p>
+<div class="tw rv">
+<div class="tdc">
+<p><strong>Modifiez le montant du bloc #001</strong> (input jaune) — observez la cascade d'invalidation en temps réel. Le réseau rejetterait cette chaîne en &lt;50ms.</p>
+<button class="rb" id="resetT" data-hover>↻ RÉINITIALISER</button>
+</div>
+<div class="tch" id="tch"></div>
+<div class="tanno" id="tanno">▸ <strong>Effet domino détecté.</strong> Le bloc modifié a changé de hash. Comme chaque bloc référence celui qui le précède, <strong>tous les suivants</strong> se retrouvent avec un hash-parent invalide. Aucun nœud honnête n'acceptera cette chaîne : elle est orpheline. <em>Coût pour un attaquant : re-miner tous les blocs postérieurs plus vite que le réseau honnête — exponentiellement improbable.</em></div>
+<div class="tcs" id="tcs"></div>
+</div>
+</div>
+</section>
+
+<section id="mining">
+<div class="inner">
+<div class="sl rv">PROOF OF WORK // 006</div>
+<h2 class="st rv scr">Minez votre <em>propre bloc</em>.</h2>
+<p class="si rv">Cliquez — votre CPU va <strong>réellement calculer des hashes SHA-256</strong> jusqu'à trouver un nonce produisant un hash en 0000. Une loterie à 1 sur 65 536.</p>
+<div class="mw rv">
+<div class="mp">
+<div class="mpl">▸ Paramètres</div>
+<div class="mpr"><span>Difficulté</span><span>0000 × 65 536</span></div>
+<div class="mpr"><span>Algorithme</span><span>SHA-256</span></div>
+<div class="mpr"><span>Récompense</span><span>6,25 TSC</span></div>
+<div class="mpr"><span>Mineur_ID</span><span id="mid" style="color:var(--mg)">0x---</span></div>
+<div class="ml">
+<div class="mc"><div class="mcl">Nonce</div><div class="mv" id="lvn">0</div></div>
+<div class="mc"><div class="mcl">Hash/s</div><div class="mv mag" id="lvr">0</div></div>
+<div class="mc"><div class="mcl">Temps</div><div class="mv gd" id="lvt">0.0s</div></div>
+</div>
+<button class="mb" id="mbtn" data-hover>⧫ LANCER LE MINAGE</button>
+</div>
+<div class="mcs" id="mcs">
+<div class="cl"><span class="p">&gt;</span>tesseract.chain v3.0.1 // Web Crypto API prête</div>
+<div class="cl"><span class="p">&gt;</span>algorithme SHA-256 chargé</div>
+<div class="cl" style="opacity:.5"><span class="p">&gt;</span>// cliquez sur [LANCER LE MINAGE]</div>
+</div>
+</div>
+<div class="lboard rv">
+  <div class="lboard-h"><span>◆ VOS BLOCS MINÉS // LEADERBOARD LOCAL</span><button id="lbClear" data-hover>↻ EFFACER</button></div>
+  <div class="lboard-rows" id="lbRows"><div class="lboard-empty">— Aucun bloc miné pour l'instant. Lancez le minage ci-dessus pour inscrire votre première signature dans le registre. —</div></div>
+</div>
+</div>
+</section>
+
+<section id="outro">
+<div class="inner">
+<div class="sl rv" style="justify-content:center">EPILOG // ∞</div>
+<h2 class="st rv scr">Ce que vous avez vu n'est qu'<em>une projection</em>.<br>La vraie chaîne se passe ailleurs.</h2>
+<p class="si rv">Blockchain 3.0 n'est pas une destination — c'est un basculement. Ce site est une projection. Le réseau réel, lui, tourne en ce moment dans une dimension que vous ne voyez pas.</p>
+<div class="octa rv">
+  <a href="#hero" class="primary" data-hover>↺ REVOIR LA PROJECTION</a>
+  <a href="https://ethereum.org/fr/whitepaper/" target="_blank" rel="noopener" data-hover>◆ LIRE UN WHITEPAPER</a>
+  <a id="shareX" href="#" target="_blank" rel="noopener" data-hover>✦ PARTAGER SUR X</a>
+</div>
+<div class="os rv">◆ FIN DE LA SIMULATION ◆</div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Exploration pédagogique et interactive de la blockchain de troisième génération via l'hypercube 4D. Minage réel (Web Crypto API), post-processing WebGL, audio génératif (Tone.js).</p>
+</div>
+<div class="fc"><h4>Concepts</h4><ul><li>▸ DAG Architecture</li><li>▸ Proof of Stake</li><li>▸ Cross-chain</li><li>▸ Sharding</li><li>▸ Zero-knowledge</li></ul></div>
+<div class="fc"><h4>Écosystème</h4><ul><li>▸ Polkadot</li><li>▸ Cosmos / IBC</li><li>▸ Solana</li><li>▸ Avalanche</li><li>▸ Algorand</li></ul></div>
+<div class="fc"><h4>Contrôles</h4><ul><li>▸ DRAG : rotation</li><li>▸ SHIFT : axe W</li><li>▸ ² : CLI</li><li>▸ help dans CLI</li><li>▸ ↑↑↓↓←→←→BA : x-ray</li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN // SIMULATION</span><span id="fcrd">X:0 Y:0 Z:0 W:0</span></div>
+<div class="fsrc">
+  <strong>▸ Sources & références</strong> — <em>Ethereum Foundation</em>, <code>The Merge</code> (sept. 2022) : réduction énergétique ≈ 99,95 %. <em>Cosmos IBC</em> & <em>Polkadot XCM</em> : protocoles d'interopérabilité inter-chaînes. <em>Solana / Aptos / Sui</em> : cibles TPS ≥ 10⁵–10⁶ via parallélisation. <em>Bitcoin whitepaper</em>, Nakamoto (2008). Les ordres de grandeur cités dans cette simulation sont indicatifs et s'appuient sur la documentation publique des écosystèmes concernés à fin 2025.
+</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="src/core.js"></script>
+<script src="src/extensions.js"></script>
+</body>
+</html>
