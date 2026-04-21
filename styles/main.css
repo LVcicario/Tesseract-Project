@@ -408,6 +408,13 @@ body.glitch{animation:glitchAll .5s}
 .lboard-row.clickable{cursor:none;transition:background .2s}
 .lboard-row.clickable:hover{background:rgba(0,240,255,.05)}
 
+/* ═══ v2.2 — Variable difficulty picker (section mining) ═══ */
+.mpr.diffpick{align-items:center}
+.diff-opts{display:inline-flex;gap:5px}
+.diff-opt{font-family:var(--m);font-size:11px;padding:4px 10px;min-width:30px;background:transparent;border:1px solid var(--b);color:var(--d);cursor:none;letter-spacing:.1em;transition:all .18s}
+.diff-opt:hover,.diff-opt:focus-visible{border-color:var(--cy);color:var(--cy);outline:none}
+.diff-opt--active{border-color:var(--cy);color:var(--cy);background:rgba(0,240,255,.1);box-shadow:0 0 10px rgba(0,240,255,.25)}
+
 /* ═══ v2.2 — Hash sandbox (section concept) ═══ */
 .hashlab{margin-top:32px;padding:28px 28px 24px;background:rgba(5,8,19,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--b);position:relative}
 .hashlab::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cy),transparent);animation:sb 4s infinite}

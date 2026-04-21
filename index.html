@@ -256,7 +256,15 @@
 <div class="mw rv">
 <div class="mp">
 <div class="mpl">▸ Paramètres</div>
-<div class="mpr"><span>Difficulté</span><span>0000 × 65 536</span></div>
+<div class="mpr"><span>Difficulté</span><span id="diffVal">0000 × 65 536</span></div>
+<div class="mpr diffpick"><span>Niveau</span>
+  <span class="diff-opts" role="radiogroup" aria-label="Niveau de difficulté de minage">
+    <button type="button" class="diff-opt" data-diff="3" data-hover role="radio" aria-checked="false" aria-label="Difficulté 3 zéros, environ 4 096 essais">3</button>
+    <button type="button" class="diff-opt diff-opt--active" data-diff="4" data-hover role="radio" aria-checked="true" aria-label="Difficulté 4 zéros, environ 65 536 essais">4</button>
+    <button type="button" class="diff-opt" data-diff="5" data-hover role="radio" aria-checked="false" aria-label="Difficulté 5 zéros, environ 1 million d'essais">5</button>
+  </span>
+</div>
+<div class="mpr"><span>Temps estimé</span><span id="diffEst">≈ 3–8 s</span></div>
 <div class="mpr"><span>Algorithme</span><span>SHA-256</span></div>
 <div class="mpr"><span>Récompense</span><span>6,25 TSC</span></div>
 <div class="mpr"><span>Mineur_ID</span><span id="mid" style="color:var(--mg)">0x---</span></div>

@@ -646,7 +646,19 @@ function mLog(m,cls=''){
   while(mcs.children.length>100)mcs.removeChild(mcs.firstChild);
 }
 
-const DIFF='0000';
+// Mining difficulty — mutable so extensions can adjust it between
+// mining runs. The string length is the number of leading hex zeros
+// the resulting SHA-256 hash must have; each extra zero multiplies
+// the expected number of attempts by 16 (exponential scaling — this
+// is the pedagogical point of PoW).
+let DIFF='0000';
+window.TSCCore=window.TSCCore||{};
+window.TSCCore.getDifficulty=()=>DIFF;
+window.TSCCore.setDifficulty=function(zeros){
+  const n=Math.max(2,Math.min(6,parseInt(zeros,10)||4));
+  DIFF='0'.repeat(n);
+  return DIFF;
+};
 async function rMine(){
   mbtn.disabled=true;mbtn.textContent='⧫ MINAGE EN COURS...';
   mcs.innerHTML='';gMd=.8;

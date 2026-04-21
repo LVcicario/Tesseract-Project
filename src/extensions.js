@@ -464,6 +464,41 @@
     },true);
   }
 
+  // ═══ Variable mining difficulty (section mining) ═══
+  // Wires up the 3/4/5-zero difficulty picker. Each extra zero
+  // multiplies expected attempts by 16, so we label the button with
+  // the exponent pedagogically and update the "temps estimé" live.
+  (function installDifficultyPicker(){
+    const opts=document.querySelectorAll('.diff-opt');
+    const valEl=$('diffVal'),estEl=$('diffEst');
+    if(!opts.length)return;
+    // Rough estimate based on a typical modern laptop (~40–80k H/s
+    // through SubtleCrypto). Kept intentionally ranged and qualitative.
+    const ESTIMATES={3:'≈ 0,1–0,5 s',4:'≈ 3–8 s',5:'≈ 1–5 min',6:'≈ 30 min – 2 h'};
+    function apply(zeros){
+      if(window.TSCCore&&window.TSCCore.setDifficulty)window.TSCCore.setDifficulty(zeros);
+      const expected=Math.pow(16,zeros).toLocaleString('fr-FR',{useGrouping:true});
+      if(valEl)valEl.textContent='0'.repeat(zeros)+' × '+expected;
+      if(estEl)estEl.textContent=ESTIMATES[zeros]||'—';
+      opts.forEach(o=>{
+        const active=parseInt(o.dataset.diff,10)===zeros;
+        o.classList.toggle('diff-opt--active',active);
+        o.setAttribute('aria-checked',active?'true':'false');
+      });
+    }
+    opts.forEach(o=>o.addEventListener('click',()=>{
+      const z=parseInt(o.dataset.diff,10);
+      apply(z);
+      if(window.TSCUi)window.TSCUi.toast(
+        'Difficulté : '+z+' zéros — '+(ESTIMATES[z]||''),
+        {level:'info',duration:2800}
+      );
+    }));
+    // Sync initial state with whatever core currently has
+    const current=(window.TSCCore&&window.TSCCore.getDifficulty&&window.TSCCore.getDifficulty())||'0000';
+    apply(current.length);
+  })();
+
   // ═══ Hash sandbox (section concept) ═══
   // Shows the avalanche effect: every character typed re-hashes the
   // input through SHA-256 and highlights which hex digits flipped.
