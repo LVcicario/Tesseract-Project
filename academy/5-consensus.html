@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 5 — Le consensus · TESSERACT.CHAIN Académie</title>
+<meta name="description" content="Cinquième leçon : comment un réseau décentralisé se met d'accord sur la vérité sans autorité centrale, même en présence de nœuds malveillants.">
+<meta name="theme-color" content="#00ff88">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Chapitre 5 — Le consensus">
+<meta property="og:description" content="Comment un réseau décentralisé tient malgré des nœuds byzantins.">
+<meta property="og:type" content="article">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-page="chapter">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN — Chapitre 5</h1><p>Ce chapitre a besoin de JavaScript pour fonctionner. Activez-le, puis rechargez la page.</p></div></div></noscript>
+
+<div id="chromAb" aria-hidden="true"></div>
+<button type="button" class="vertexmark" id="vmark" aria-label="Blocs minés — cliquez pour voir vos statistiques">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span><span class="vertexmark__hint">▸ CLIC POUR DÉTAIL</span></button>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true">
+  <div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div>
+  <div id="xBody"></div>
+</aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X">
+  <button class="xclose" id="xrClose" data-hover>✕ SORTIR</button>
+  <h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3>
+  <pre id="xrDump">—</pre>
+</div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée. Tapez help pour la liste des commandes.</span></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>CH_05</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="../academy.html" data-hover>◆ ACADÉMIE</a>
+<span class="hwallet" id="hwallet" data-hover title="Votre wallet simulé — cliquez pour détails"><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section id="ch-hero">
+<div class="inner" style="--c:#00ff88">
+  <nav class="ch-crumb" aria-label="Fil d'Ariane">
+    <a href="../academy.html">Académie</a>
+    <span class="sep">/</span>
+    <span class="curr">Chapitre 5</span>
+  </nav>
+  <div class="ch-num">CHAPITRE 05 · ★★★ AVANCÉ</div>
+  <h1 class="ch-title">Le <em>consensus</em>.<br>S'accorder sans chef.</h1>
+  <p class="ch-lede">Cinq machines, jamais dans la même pièce, parfois hostiles, parfois lentes, parfois mensongères. Comment se mettent-elles d'accord sur la version officielle de la chaîne ? Ce chapitre t'explique le <span class="gloss" data-term="consensus">consensus</span> à l'épreuve du feu : l'un des nœuds va mentir, tu choisis le <strong>quorum</strong>, et tu vois ce qui tient.</p>
+  <div class="ch-meta"><span>Durée <strong>≈ 15 min</strong></span><span>Niveau <strong>★★★ Avancé</strong></span><span>Prérequis <strong>Chapitres 1 à 4</strong></span></div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00ff88">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">01</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Raconter</div>
+      <h2 class="ch-step__t">Le problème des <em>généraux byzantins</em>.</h2>
+      <p>Imagine plusieurs généraux autour d'une ville assiégée. Pour gagner, ils doivent attaquer tous ensemble. Ils communiquent par messagers — pas de téléphone, pas d'Internet. Problème : <strong>certains messagers peuvent être des espions</strong>, et certains généraux peuvent être des traîtres. Comment trancher, malgré ça, sur l'heure de l'attaque ?</p>
+      <p>Ce casse-tête formalisé en 1982 par Leslie Lamport s'appelle le <strong>problème des généraux byzantins</strong>. La démonstration clé : tant que <strong>moins d'un tiers</strong> des participants mentent, on peut toujours tomber d'accord par un protocole de vote. Passé un tiers, plus aucune garantie. Voilà pourquoi Bitcoin exige qu'aucun acteur ne contrôle plus de la moitié de la puissance de calcul, et pourquoi Ethereum (Proof of Stake) tient tant qu'une minorité &lt; 1/3 est mal-intentionnée.</p>
+      <div class="ch-analogy">
+        <strong>Analogie.</strong> Quand 5 amis se demandent « on va au ciné ou à la plage ? », il suffit de la majorité pour trancher. Si l'un ment sur son vote, il reste 4 voix honnêtes. Même à 2 menteurs sur 5, 3 voix honnêtes imposent leur choix. Au-delà, le vote est cassé — les menteurs peuvent imposer n'importe quoi. Une blockchain, c'est exactement ça, mais avec des millions de voix et un message « ce bloc est-il valide ? » tous les 10 secondes.
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00ff88">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">02</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Montrer</div>
+      <h2 class="ch-step__t">Cinq nœuds. Un vote.</h2>
+      <p>Ci-dessous, cinq nœuds reçoivent une proposition de bloc. Chaque nœud honnête vote « accept » (le bloc est bien construit). Tu peux transformer certains nœuds en <strong>byzantins</strong> — ils voteront systématiquement contre pour faire échouer la chaîne. Change aussi le <strong>quorum</strong> (le nombre minimum de votes « accept » nécessaires pour que le bloc soit adopté).</p>
+      <p>Observe le verdict en direct. Combien de nœuds byzantins peut-on tolérer pour chaque quorum ?</p>
+      <div class="ch-demo">
+        <div class="ch-demo-label">▸ SIMULATION DE CONSENSUS · 5 NŒUDS</div>
+        <div class="ch5-net" aria-label="Simulation de vote consensus">
+          <div class="ch5-net__nodes" id="ch5Nodes"></div>
+          <div class="ch5-net__controls">
+            <div class="ch5-net__stat">Quorum requis
+              <span class="ch5-net__quorum" id="ch5Quorum" role="radiogroup" aria-label="Quorum">
+                <button type="button" data-q="3" role="radio" aria-checked="false" data-hover>3 / 5</button>
+                <button type="button" data-q="4" role="radio" aria-checked="true" class="active" data-hover>4 / 5</button>
+                <button type="button" data-q="5" role="radio" aria-checked="false" data-hover>5 / 5</button>
+              </span>
+            </div>
+            <div class="ch5-net__stat">Votes « accept » <strong id="ch5Votes">—</strong> / 5</div>
+            <div class="ch5-net__verdict" id="ch5Verdict">EN ATTENTE</div>
+          </div>
+          <div class="ch5-net__actions">
+            <button type="button" class="ch5-net__btn" id="ch5Propose" data-hover>▸ PROPOSER UN BLOC</button>
+            <button type="button" class="ch5-net__btn" id="ch5Reset" data-hover>↻ RÉINITIALISER</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00ff88">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">03</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Faire</div>
+      <h2 class="ch-step__t"><em>Tolérance</em> et <em>rupture</em>.</h2>
+      <p>Fais l'expérience. Avec quorum à <strong>3/5</strong>, combien de byzantins peux-tu rendre sans casser le consensus ? Avec <strong>4/5</strong> ? Avec <strong>5/5</strong> ? Tu vas découvrir une loi simple : plus le quorum est élevé, plus le système tolère de menteurs, mais plus il devient <strong>paralysable</strong> (un seul lent ou hors-ligne suffit à bloquer la décision).</p>
+      <p>C'est le triangle d'équilibre de tout consensus distribué : <strong>sécurité</strong> (ne pas accepter de faux bloc), <strong>vivacité</strong> (ne pas rester bloqué), <strong>tolérance aux pannes</strong>. Aucun protocole ne maximise les trois à la fois.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff00d4">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">04</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Défier</div>
+      <h2 class="ch-step__t">Résiste à <em>deux menteurs</em>.</h2>
+      <p>Ton défi : trouve une configuration (choix du quorum et nombre de nœuds byzantins) telle que le bloc soit <strong>accepté malgré 2 nœuds byzantins sur 5</strong>. Le défi est validé automatiquement dès que la simulation affiche « ACCEPTÉ » avec au moins deux nœuds transformés en byzantins.</p>
+      <div class="ch-chall" data-challenge="5.resist-byzantine">
+        <div class="ch-chall__h">
+          <span class="ch-chall__k">◆ DÉFI // TENIR AVEC 2 BYZANTINS</span>
+          <span class="ch-chall__status" id="ch5ChallStatus">EN ATTENTE</span>
+        </div>
+        <p class="ch-chall__prompt">Transforme 2 nœuds honnêtes en byzantins dans la simulation ci-dessus, choisis un quorum adapté, et fais passer un bloc. <strong>Verdict attendu : ACCEPTÉ.</strong></p>
+        <div class="ch-chall__tries"><span>Byzantins actifs <strong id="ch5ByzCount">0</strong> / 5</span><span id="ch5ChallGuide">Transforme deux nœuds puis propose un bloc</span></div>
+        <div class="ch-chall__feedback" id="ch5ChallFeedback" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00ff88">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">05</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Retenir</div>
+      <h2 class="ch-step__t">Ce qu'il faut <em>garder</em>.</h2>
+      <div class="ch-summary">
+        <div class="ch-summary__k">◆ À RETENIR</div>
+        <ul>
+          <li>Le <strong>consensus</strong> est la règle par laquelle un réseau décentralisé s'accorde sur un état commun.</li>
+          <li>Un <span class="gloss" data-term="byzantin">nœud byzantin</span> est un nœud qui peut mentir, se taire, ou attaquer le protocole.</li>
+          <li>La <strong>théorie des généraux byzantins</strong> (Lamport, 1982) montre qu'un consensus tient tant que les byzantins sont &lt; 1/3 des participants.</li>
+          <li>Le <strong>quorum</strong> règle le compromis entre sécurité (élevé = dur à subvertir) et vivacité (élevé = facile à bloquer).</li>
+          <li>Un <strong>fork</strong> apparaît quand deux groupes de nœuds ne s'accordent plus. Le réseau finit par en conserver une seule branche — la plus longue / la plus travaillée.</li>
+        </ul>
+      </div>
+
+      <div class="ch-quiz" aria-label="Quiz de fin de chapitre">
+        <div class="ch-quiz__k">◆ QUIZ // 3 QUESTIONS</div>
+
+        <div class="ch-q" data-q="1" data-correct="2">
+          <div class="ch-q__num">QUESTION 1 / 3</div>
+          <div class="ch-q__t">Un nœud est dit <strong>byzantin</strong> quand il…</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>vient d'Istanbul.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>est temporairement hors ligne.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>peut mentir, contredire, attaquer — bref, dévier arbitrairement du protocole.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Pire cas plutôt que panne simple.</strong> Un nœud en panne est « crash-fault » : il disparaît proprement. Un nœud byzantin, lui, reste actif mais ment — c'est le cas le plus difficile à tolérer.</div>
+        </div>
+
+        <div class="ch-q" data-q="2" data-correct="0">
+          <div class="ch-q__num">QUESTION 2 / 3</div>
+          <div class="ch-q__t">Pourquoi un quorum <strong>élevé</strong> rend-il le système plus sûr mais moins réactif ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Plus de votes requis = plus dur pour un attaquant, mais un seul lent ou hors ligne suffit à tout bloquer.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Les messages sont plus gros.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Le quorum n'a aucun effet sur la vivacité.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Trilemme classique.</strong> Sécurité, vivacité et tolérance aux pannes forment un triangle — aucun protocole ne maximise les trois à la fois. Les blockchains modernes font des arbitrages différents (Bitcoin mise sur sécurité, Solana sur vivacité, etc.).</div>
+        </div>
+
+        <div class="ch-q" data-q="3" data-correct="1">
+          <div class="ch-q__num">QUESTION 3 / 3</div>
+          <div class="ch-q__t">Quelle proportion maximum de nœuds byzantins un consensus BFT peut-il tolérer ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Jusqu'à la moitié.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Moins d'un tiers.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Jusqu'à 99 %.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Borne théorique stricte.</strong> Démontrée par Lamport, Shostak et Pease en 1982. Passé ce seuil, aucun protocole ne peut garantir à la fois sécurité et vivacité — peu importe l'ingéniosité.</div>
+        </div>
+
+        <div class="ch-quiz__score" id="ch5QuizScore">
+          <div class="ch-quiz__score-l">Score</div>
+          <div class="ch-quiz__score-n"><span id="ch5QuizN">0</span><span style="color:var(--wk)">/3</span></div>
+          <div class="ch-quiz__score-l" id="ch5QuizMsg">—</div>
+        </div>
+      </div>
+
+      <nav class="ch-nav" aria-label="Navigation entre chapitres">
+        <a class="ch-nav__prev" href="4-les-identites.html"><span class="ch-nav__k">◂ précédent</span><span class="ch-nav__t">Chapitre 4 · Les identités</span></a>
+        <span class="ch-nav__next ch-nav__locked"><span class="ch-nav__k">suivant ▸</span><span class="ch-nav__t">Chapitre 6 · bientôt</span></span>
+      </nav>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Chapitre 5 du parcours Académie — consensus distribué et tolérance byzantine, simulés à 5 nœuds.</p>
+</div>
+<div class="fc"><h4>Parcours</h4><ul><li>▸ <a href="1-le-hash.html" style="color:inherit;text-decoration:none">Chapitre 1 — Le hash</a></li><li>▸ <a href="2-le-bloc.html" style="color:inherit;text-decoration:none">Chapitre 2 — Le bloc</a></li><li>▸ <a href="3-course-au-nonce.html" style="color:inherit;text-decoration:none">Chapitre 3 — La course au nonce</a></li><li>▸ <a href="4-les-identites.html" style="color:inherit;text-decoration:none">Chapitre 4 — Les identités</a></li><li>▸ <strong style="color:var(--gr)">Chapitre 5 — Le consensus</strong></li><li>▸ Chapitre 6 — Les programmes</li></ul></div>
+<div class="fc"><h4>Ressources</h4><ul><li>▸ Lamport 1982</li><li>▸ PBFT · Castro & Liskov</li><li>▸ Nakamoto consensus</li></ul></div>
+<div class="fc"><h4>Contrôles</h4><ul><li>▸ ² ou ~ : CLI</li><li>▸ clic terme souligné : glossaire</li><li>▸ Esc : fermer overlay</li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN — CHAPITRE 5 // MIT</span><span id="fcrd">CH 05/06</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="../src/lifecycle.js"></script>
+<script src="../src/ui.js"></script>
+<script src="../src/core.js"></script>
+<script src="../src/extensions.js"></script>
+<script src="../src/academy.js"></script>
+<script src="../src/chapter-5.js"></script>
+</body>
+</html>

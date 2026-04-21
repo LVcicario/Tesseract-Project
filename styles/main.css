@@ -677,6 +677,37 @@ body[data-page="academy"] #boot,body[data-page="academy"] .shint{display:none!im
 .ch4-sign__res strong{color:var(--w)}
 @media(max-width:720px){.ch4-id{grid-template-columns:1fr}}
 
+/* Chapter 5 — consensus simulation */
+.ch5-net{margin-top:10px;padding:22px;background:#000;border:1px solid var(--b)}
+.ch5-net__nodes{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:18px}
+.ch5-node{padding:14px;border:1px solid var(--b);text-align:center;font-family:var(--m);font-size:11px;position:relative;transition:all .35s;background:rgba(5,8,19,.6)}
+.ch5-node.honest{border-color:rgba(0,255,136,.45)}
+.ch5-node.byzantine{border-color:rgba(255,34,68,.45);background:rgba(255,34,68,.05)}
+.ch5-node__id{color:var(--wk);font-size:10px;letter-spacing:.25em;margin-bottom:8px;text-transform:uppercase}
+.ch5-node__kind{font-family:var(--dp);font-size:18px;font-weight:800;color:var(--gr);text-transform:uppercase;margin-bottom:6px}
+.ch5-node.byzantine .ch5-node__kind{color:var(--rd)}
+.ch5-node__vote{padding:4px 8px;margin-top:6px;font-size:10px;letter-spacing:.2em;display:inline-block;border:1px solid currentColor}
+.ch5-node__vote--yes{color:var(--gr)}
+.ch5-node__vote--no{color:var(--rd)}
+.ch5-node__vote--idle{color:var(--wk)}
+.ch5-node__toggle{margin-top:10px;padding:5px 10px;font-family:var(--m);font-size:9px;background:transparent;border:1px solid var(--wk);color:var(--wk);cursor:none;text-transform:uppercase;letter-spacing:.18em;transition:all .2s}
+.ch5-node__toggle:hover:not(:disabled),.ch5-node__toggle:focus-visible{border-color:var(--rd);color:var(--rd);outline:none}
+.ch5-node.byzantine .ch5-node__toggle{border-color:var(--rd);color:var(--rd)}
+.ch5-net__controls{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;padding-top:14px;border-top:1px dashed var(--b)}
+.ch5-net__stat{font-family:var(--m);font-size:11px;color:var(--d);letter-spacing:.18em;text-transform:uppercase}
+.ch5-net__stat strong{color:var(--cy);font-weight:700}
+.ch5-net__verdict{padding:8px 16px;font-family:var(--m);font-size:11px;letter-spacing:.28em;text-transform:uppercase;border:1px solid var(--wk);color:var(--wk)}
+.ch5-net__verdict.accept{border-color:var(--gr);color:var(--gr);background:rgba(0,255,136,.08)}
+.ch5-net__verdict.reject{border-color:var(--rd);color:var(--rd);background:rgba(255,34,68,.08)}
+.ch5-net__actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.ch5-net__btn{font-family:var(--m);font-size:11px;letter-spacing:.25em;padding:10px 18px;background:transparent;border:1px solid var(--cy);color:var(--cy);cursor:none;text-transform:uppercase;transition:all .2s}
+.ch5-net__btn:hover:not(:disabled),.ch5-net__btn:focus-visible{background:var(--cy);color:#000;outline:none}
+.ch5-net__btn:disabled{opacity:.5;cursor:not-allowed}
+.ch5-net__quorum{display:inline-flex;gap:6px;margin-top:6px}
+.ch5-net__quorum button{font-family:var(--m);font-size:10px;padding:5px 10px;background:transparent;border:1px solid var(--b);color:var(--d);cursor:none;transition:all .2s}
+.ch5-net__quorum button.active{border-color:var(--cy);background:rgba(0,240,255,.1);color:var(--cy)}
+.ch5-net__quorum button:hover:not(.active){border-color:var(--cy);color:var(--cy)}
+
 /* ═══ v2.2 — Glossaire flottant ═══ */
 .gloss{border-bottom:1px dashed rgba(0,240,255,.55);cursor:none;color:inherit;transition:color .18s}
 .gloss:hover,.gloss:focus-visible{color:var(--cy);outline:none}
