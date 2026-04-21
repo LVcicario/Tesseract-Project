@@ -15,10 +15,13 @@ addEventListener('mouseup',()=>cursor.classList.remove('click'));
 let aR=false,aE=true;
 let drone,dF,mG,shm,hvS,clS,dpS,nsS,chS;
 const aBtn=$('audioBtn');
+let _bootAudioPromise=null;
 
 async function bootAudio(){
   if(aR)return;
+  if(_bootAudioPromise)return _bootAudioPromise;
   if(typeof Tone==='undefined'){console.warn('Tone unavailable');return}
+  _bootAudioPromise=(async()=>{
   try{
     await Tone.start();
     mG=new Tone.Gain(.5).toDestination();
@@ -39,8 +42,16 @@ async function bootAudio(){
     aR=true;aE=true;
     aBtn.classList.add('active');aBtn.textContent='♪ AUDIO ON';
   }catch(e){console.warn('audio fail',e);aBtn.textContent='♪ AUDIO N/A';aBtn.disabled=true}
+  })();
+  return _bootAudioPromise;
 }
-function tAudio(){if(!aR){bootAudio();return}aE=!aE;mG.gain.rampTo(aE?.5:0,.3);aBtn.classList.toggle('active',aE);aBtn.textContent=aE?'♪ AUDIO ON':'♪ AUDIO'}
+async function tAudio(){
+  if(!aR){aBtn.textContent='♪ AUDIO…';await bootAudio();return}
+  aE=!aE;
+  if(mG)mG.gain.rampTo(aE?.5:0,.3);
+  aBtn.classList.toggle('active',aE);
+  aBtn.textContent=aE?'♪ AUDIO ON':'♪ AUDIO OFF';
+}
 aBtn.addEventListener('click',tAudio);
 function fg(){if(!aR)bootAudio()}
 addEventListener('click',fg);addEventListener('keydown',fg);
