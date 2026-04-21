@@ -617,6 +617,28 @@ body[data-page="academy"] #boot,body[data-page="academy"] .shint{display:none!im
 .ch2-blk__warn{font-size:10px;color:var(--rd);letter-spacing:.1em}
 .ch2-blk.source .ch2-blk__warn{color:var(--gd)}
 
+/* Chapter 3 — mining sandbox */
+.ch3-mine{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+.ch3-mine__col{background:#000;border:1px solid var(--b);padding:18px;font-family:var(--m);font-size:11px;line-height:1.6}
+.ch3-mine__col h4{font-size:10px;letter-spacing:.28em;color:var(--cy);margin:0 0 12px;text-transform:uppercase;font-weight:700}
+.ch3-mine__row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--b);color:var(--d)}
+.ch3-mine__row:last-child{border-bottom:none}
+.ch3-mine__row strong{color:var(--cy);font-variant-numeric:tabular-nums}
+.ch3-mine__diff{display:inline-flex;gap:5px;margin:12px 0}
+.ch3-mine__diff button{font-family:var(--m);font-size:11px;padding:5px 11px;background:transparent;border:1px solid var(--b);color:var(--d);cursor:none;transition:all .2s}
+.ch3-mine__diff button:hover:not(.active),.ch3-mine__diff button:focus-visible{border-color:var(--mg);color:var(--mg);outline:none}
+.ch3-mine__diff button.active{border-color:var(--mg);background:rgba(255,0,212,.12);color:var(--mg);box-shadow:0 0 10px rgba(255,0,212,.25)}
+.ch3-mine__btn{width:100%;font-family:var(--m);font-size:12px;letter-spacing:.28em;padding:14px;background:transparent;border:1px solid var(--mg);color:var(--mg);cursor:none;text-transform:uppercase;margin-top:14px;transition:all .25s}
+.ch3-mine__btn:hover:not(:disabled),.ch3-mine__btn:focus-visible{background:var(--mg);color:#000;outline:none}
+.ch3-mine__btn:disabled{opacity:.55;cursor:wait}
+.ch3-mine__log{max-height:220px;overflow-y:auto;font-size:10.5px;color:var(--d);padding-right:4px}
+.ch3-mine__log::-webkit-scrollbar{width:3px}
+.ch3-mine__log::-webkit-scrollbar-thumb{background:var(--mg)}
+.ch3-mine__log .ok{color:var(--gr)}
+.ch3-mine__log .info{color:var(--cy)}
+.ch3-mine__log .needle{color:var(--mg);word-break:break-all}
+@media(max-width:720px){.ch3-mine{grid-template-columns:1fr}}
+
 /* ═══ v2.2 — Glossaire flottant ═══ */
 .gloss{border-bottom:1px dashed rgba(0,240,255,.55);cursor:none;color:inherit;transition:color .18s}
 .gloss:hover,.gloss:focus-visible{color:var(--cy);outline:none}

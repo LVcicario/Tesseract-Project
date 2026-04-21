@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 3 — La course au nonce · TESSERACT.CHAIN Académie</title>
+<meta name="description" content="Troisième leçon : comment le Proof of Work transforme de l'électricité en sécurité. Minage SHA-256 réel à difficulté croissante.">
+<meta name="theme-color" content="#8b5cf6">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Chapitre 3 — La course au nonce">
+<meta property="og:description" content="Le Proof of Work expliqué par le minage réel.">
+<meta property="og:type" content="article">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-page="chapter">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN — Chapitre 3</h1><p>Ce chapitre a besoin de JavaScript pour fonctionner. Activez-le, puis rechargez la page.</p></div></div></noscript>
+
+<div id="chromAb" aria-hidden="true"></div>
+<button type="button" class="vertexmark" id="vmark" aria-label="Blocs minés — cliquez pour voir vos statistiques">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span><span class="vertexmark__hint">▸ CLIC POUR DÉTAIL</span></button>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true">
+  <div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div>
+  <div id="xBody"></div>
+</aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X">
+  <button class="xclose" id="xrClose" data-hover>✕ SORTIR</button>
+  <h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3>
+  <pre id="xrDump">—</pre>
+</div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée. Tapez help pour la liste des commandes.</span></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>CH_03</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="../academy.html" data-hover>◆ ACADÉMIE</a>
+<span class="hwallet" id="hwallet" data-hover title="Votre wallet simulé — cliquez pour détails"><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section id="ch-hero">
+<div class="inner" style="--c:#8b5cf6">
+  <nav class="ch-crumb" aria-label="Fil d'Ariane">
+    <a href="../academy.html">Académie</a>
+    <span class="sep">/</span>
+    <span class="curr">Chapitre 3</span>
+  </nav>
+  <div class="ch-num">CHAPITRE 03 · ★★ INTERMÉDIAIRE</div>
+  <h1 class="ch-title">La <em>course</em><br>au nonce.</h1>
+  <p class="ch-lede">Chaque dizaine de minutes, quelque part sur Terre, <strong>des millions d'ordinateurs</strong> essaient au même moment des milliards de nombres différents. Le premier qui trouve un nombre magique gagne le droit d'ajouter le prochain bloc à la chaîne Bitcoin — et empoche la récompense. Ce jeu, c'est le <span class="gloss" data-term="pow">Proof of Work</span>. Tu vas y jouer toi aussi, à petite échelle.</p>
+  <div class="ch-meta"><span>Durée <strong>≈ 15 min</strong></span><span>Niveau <strong>★★ Intermédiaire</strong></span><span>Prérequis <strong>Chapitres 1 + 2</strong></span></div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#8b5cf6">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">01</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Raconter</div>
+      <h2 class="ch-step__t">Transformer de <em>l'électricité</em> en sécurité.</h2>
+      <p>Au chapitre 2, on a vu qu'une chaîne ne peut pas être modifiée sans recalculer tous les blocs suivants. Mais un tricheur motivé pourrait le faire <em>discrètement</em> chez lui. Comment empêcher ça à l'échelle d'Internet ?</p>
+      <p>L'idée géniale de Satoshi en 2008 : obliger chaque nouveau bloc à coûter <strong>un travail informatique bien précis</strong>, et rendre la difficulté de ce travail adaptable. Pas n'importe quel hash suffit : il faut un hash qui commence par un nombre précis de zéros. Comme un hash est imprévisible, la seule façon d'en obtenir un est d'essayer : on change une toute petite partie du bloc — le <span class="gloss" data-term="nonce">nonce</span> — et on re-hache, encore et encore.</p>
+      <div class="ch-analogy">
+        <strong>Analogie.</strong> Imagine que pour remporter une enchère, il faut lancer un dé d'un million de faces jusqu'à tomber sur un numéro qui commence par <em>00</em>. Il n'y a pas de technique, pas d'astuce, pas de talent : <strong>seulement le nombre de lancers</strong>. Plus tu lances vite, plus tu as de chances de gagner. C'est exactement ce que font les <em>fermes de minage</em> : elles lancent le dé à raison de milliards de fois par seconde.</p>
+      </div>
+      <p>Conséquence magnifique : pour tricher sur le passé, il ne suffit plus de recalculer les hashes — il faut aussi <strong>refaire tout le Proof of Work</strong> de chaque bloc. Et ça coûte de l'électricité. Beaucoup d'électricité. <em>Tellement</em>, que les tricheurs abandonnent.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#8b5cf6">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">02</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Montrer</div>
+      <h2 class="ch-step__t">Ton CPU, <em>à l'œuvre</em>.</h2>
+      <p>Ci-dessous, un mineur en miniature. Choisis une <strong>difficulté</strong> (nombre de zéros requis en tête du hash), lance le minage, et regarde ton processeur parcourir les nonces un à un. Chaque zéro supplémentaire multiplie le nombre d'essais attendus par <strong>16</strong>.</p>
+      <ul>
+        <li><strong>3 zéros</strong> — ≈ 4 096 essais en moyenne. Quasi-instantané.</li>
+        <li><strong>4 zéros</strong> — ≈ 65 536 essais. Quelques secondes.</li>
+        <li><strong>5 zéros</strong> — ≈ 1 million d'essais. Plusieurs minutes sur un laptop.</li>
+        <li>À titre de comparaison : <strong>Bitcoin</strong> exige aujourd'hui environ <strong>19 zéros</strong>. Soit 10^22 essais pour un bloc — possible uniquement parce que des millions de machines spécialisées essaient en parallèle.</li>
+      </ul>
+      <div class="ch-demo">
+        <div class="ch-demo-label">▸ MINEUR ACADÉMIE</div>
+        <div class="ch3-mine">
+          <div class="ch3-mine__col">
+            <h4>Paramètres</h4>
+            <div class="ch3-mine__row"><span>Algorithme</span><strong>SHA-256</strong></div>
+            <div class="ch3-mine__row"><span>Difficulté</span><strong id="ch3DiffLabel">0000</strong></div>
+            <div class="ch3-mine__row"><span>Essais attendus</span><strong id="ch3ExpLabel">~65 536</strong></div>
+            <div class="ch3-mine__row"><span>Temps estimé</span><strong id="ch3TimeLabel">≈ 3–8 s</strong></div>
+            <div class="ch3-mine__diff" role="radiogroup" aria-label="Difficulté de minage">
+              <button type="button" data-diff="3" role="radio" aria-checked="false" data-hover>3 zéros</button>
+              <button type="button" data-diff="4" role="radio" aria-checked="true" class="active" data-hover>4 zéros</button>
+              <button type="button" data-diff="5" role="radio" aria-checked="false" data-hover>5 zéros</button>
+            </div>
+            <div class="ch3-mine__row"><span>Essais</span><strong id="ch3Nonce">0</strong></div>
+            <div class="ch3-mine__row"><span>Hash/s</span><strong id="ch3Rate">0</strong></div>
+            <div class="ch3-mine__row"><span>Temps écoulé</span><strong id="ch3Elapsed">0,00 s</strong></div>
+            <button type="button" class="ch3-mine__btn" id="ch3Go" data-hover>⧫ LANCER LE MINAGE</button>
+          </div>
+          <div class="ch3-mine__col">
+            <h4>Journal du mineur</h4>
+            <div class="ch3-mine__log" id="ch3Log"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#8b5cf6">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">03</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Faire</div>
+      <h2 class="ch-step__t">Sens l'<em>effort</em> augmenter.</h2>
+      <p>Mine une première fois à <strong>3 zéros</strong>. Puis relance à <strong>4 zéros</strong>. Puis à <strong>5 zéros</strong>. Compare les temps. Tu n'attendras pas le double, tu attendras <strong>dix à vingt fois plus longtemps</strong> — l'échelle est exponentielle.</p>
+      <p>Ce que tu viens de ressentir, c'est la <strong>pression énergétique</strong> du Proof of Work. Chaque zéro supplémentaire rend la chaîne 16 fois plus coûteuse à attaquer. Bitcoin cumule aujourd'hui 19 zéros, ce qui explique à la fois son inviolabilité <em>et</em> sa consommation électrique colossale. C'est le cœur du débat sur les blockchains modernes : comment garder la sécurité sans brûler la planète ? Réponse partielle au chapitre suivant, puis 4 et 5.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff00d4">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">04</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Défier</div>
+      <h2 class="ch-step__t">Mine un <em>bloc complet</em>.</h2>
+      <p>Ton défi : mine avec succès à <strong>au moins 4 zéros</strong>. Pas de piège, aucun réglage sournois — lance simplement le mineur et laisse ton CPU chercher. Attends le hash valide. Le défi se valide automatiquement.</p>
+      <div class="ch-chall" data-challenge="3.mine-4">
+        <div class="ch-chall__h">
+          <span class="ch-chall__k">◆ DÉFI // MINER À DIFFICULTÉ ≥ 4</span>
+          <span class="ch-chall__status" id="ch3ChallStatus">EN ATTENTE</span>
+        </div>
+        <p class="ch-chall__prompt">Lance le mineur ci-dessus avec une difficulté de <strong>4 zéros ou plus</strong>, puis attends qu'il trouve un hash valide. Quand le journal affiche « ✦ HASH VALIDE TROUVÉ », c'est gagné.</p>
+        <div class="ch-chall__tries"><span>Meilleur nonce trouvé <strong id="ch3BestNonce">—</strong></span><span id="ch3Guide">En attente du premier minage</span></div>
+        <div class="ch-chall__feedback" id="ch3ChallFeedback" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00ff88">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">05</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Retenir</div>
+      <h2 class="ch-step__t">Ce qu'il faut <em>garder</em>.</h2>
+      <div class="ch-summary">
+        <div class="ch-summary__k">◆ À RETENIR</div>
+        <ul>
+          <li>Le <strong>Proof of Work</strong> oblige chaque nouveau bloc à être accompagné d'un hash qui satisfait une contrainte rare (ex. commencer par N zéros).</li>
+          <li>Le <strong>nonce</strong> est la partie libre du bloc que le mineur fait varier jusqu'à trouver un hash valide.</li>
+          <li>Chaque zéro supplémentaire exigé multiplie le travail par <strong>16</strong> — l'échelle est exponentielle.</li>
+          <li>Tricher sur le passé nécessite de <strong>refaire tout le Proof of Work</strong> de chaque bloc affecté plus vite que le reste du réseau. Économiquement absurde au-delà de quelques blocs de profondeur.</li>
+          <li>Le PoW transforme littéralement de l'<strong>électricité en sécurité</strong> — c'est son génie et sa faiblesse, selon l'angle choisi.</li>
+        </ul>
+      </div>
+
+      <div class="ch-quiz" aria-label="Quiz de fin de chapitre">
+        <div class="ch-quiz__k">◆ QUIZ // 3 QUESTIONS</div>
+
+        <div class="ch-q" data-q="1" data-correct="2">
+          <div class="ch-q__num">QUESTION 1 / 3</div>
+          <div class="ch-q__t">Que fait un mineur, concrètement ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Il valide manuellement les transactions.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Il choisit la meilleure chaîne.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Il fait varier un nonce jusqu'à obtenir un hash qui respecte la contrainte.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Force brute calibrée.</strong> Le minage est une recherche exhaustive probabiliste sur l'espace des nonces. Aucun talent à avoir, juste du débit de hash.</div>
+        </div>
+
+        <div class="ch-q" data-q="2" data-correct="1">
+          <div class="ch-q__num">QUESTION 2 / 3</div>
+          <div class="ch-q__t">Si la difficulté augmente d'un zéro, le temps moyen de minage est multiplié par…</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>2</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>16</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>256</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Base 16.</strong> Le hash est exprimé en hexadécimal : 16 valeurs possibles par caractère. Exiger un zéro supplémentaire divise par 16 la probabilité qu'un nonce au hasard satisfasse la contrainte.</div>
+        </div>
+
+        <div class="ch-q" data-q="3" data-correct="1">
+          <div class="ch-q__num">QUESTION 3 / 3</div>
+          <div class="ch-q__t">Pourquoi le PoW sécurise-t-il le <strong>passé</strong> d'une blockchain ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Parce que le réseau efface automatiquement les anciens blocs.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Parce que refaire le travail de tous les blocs suivants coûterait plus d'électricité qu'on n'en peut acheter.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Parce que personne ne connaît l'algorithme.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Sécurité économique.</strong> Les règles de la blockchain sont publiques — tout le monde connaît SHA-256. La sécurité ne vient pas du secret, elle vient du <em>coût</em>.</div>
+        </div>
+
+        <div class="ch-quiz__score" id="ch3QuizScore">
+          <div class="ch-quiz__score-l">Score</div>
+          <div class="ch-quiz__score-n"><span id="ch3QuizN">0</span><span style="color:var(--wk)">/3</span></div>
+          <div class="ch-quiz__score-l" id="ch3QuizMsg">—</div>
+        </div>
+      </div>
+
+      <nav class="ch-nav" aria-label="Navigation entre chapitres">
+        <a class="ch-nav__prev" href="2-le-bloc.html"><span class="ch-nav__k">◂ précédent</span><span class="ch-nav__t">Chapitre 2 · Le bloc</span></a>
+        <span class="ch-nav__next ch-nav__locked"><span class="ch-nav__k">suivant ▸</span><span class="ch-nav__t">Chapitre 4 · bientôt</span></span>
+      </nav>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Chapitre 3 du parcours Académie — la mécanique du Proof of Work et sa pression énergétique, expérimentée sur votre propre CPU.</p>
+</div>
+<div class="fc"><h4>Parcours</h4><ul><li>▸ <a href="1-le-hash.html" style="color:inherit;text-decoration:none">Chapitre 1 — Le hash</a></li><li>▸ <a href="2-le-bloc.html" style="color:inherit;text-decoration:none">Chapitre 2 — Le bloc</a></li><li>▸ <strong style="color:var(--vi)">Chapitre 3 — La course au nonce</strong></li><li>▸ Chapitre 4 — Les identités</li><li>▸ Chapitre 5 — Le consensus</li><li>▸ Chapitre 6 — Les programmes</li></ul></div>
+<div class="fc"><h4>Ressources</h4><ul><li>▸ Bitcoin whitepaper §4</li><li>▸ Difficulty adjustment</li><li>▸ Hashrate statistics</li></ul></div>
+<div class="fc"><h4>Contrôles</h4><ul><li>▸ ² ou ~ : CLI</li><li>▸ clic terme souligné : glossaire</li><li>▸ Esc : fermer overlay</li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN — CHAPITRE 3 // MIT</span><span id="fcrd">CH 03/06</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="../src/lifecycle.js"></script>
+<script src="../src/ui.js"></script>
+<script src="../src/core.js"></script>
+<script src="../src/extensions.js"></script>
+<script src="../src/academy.js"></script>
+<script src="../src/chapter-3.js"></script>
+</body>
+</html>
