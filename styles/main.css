@@ -840,6 +840,41 @@ body[data-page="academy"] #boot,body[data-page="academy"] .shint{display:none!im
 .nf__lede{font-size:16px;line-height:1.7;color:var(--d);margin-bottom:30px}
 .nf__links{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
 
+/* ═══ v3.1 — Academy completion certificate ═══ */
+#ay-finale{display:none;padding:80px 36px 40px}
+#ay-finale.on{display:block;animation:fu .6s}
+.finale-card{max-width:920px;margin:0 auto;padding:48px;background:rgba(5,8,19,.7);backdrop-filter:blur(var(--blur-lg));-webkit-backdrop-filter:blur(var(--blur-lg));border:1px solid var(--cy);box-shadow:0 30px 80px rgba(0,240,255,.15);position:relative;overflow:hidden}
+.finale-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cy),var(--mg),var(--vi),transparent);animation:sb 5s infinite}
+.finale-kicker{font-family:var(--m);font-size:11px;letter-spacing:.45em;color:var(--gd);text-transform:uppercase;margin-bottom:18px}
+.finale-h{font-family:var(--dp);font-size:clamp(44px,6vw,78px);font-weight:900;line-height:.98;letter-spacing:-.02em;background:linear-gradient(180deg,#fff 0%,var(--gd) 60%,var(--mg) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;margin:0 0 22px}
+.finale-h em{font-style:normal;color:var(--cy)}
+.finale-lede{font-size:16px;line-height:1.75;color:var(--d);margin-bottom:28px;max-width:680px}
+.finale-lede strong{color:var(--w);font-weight:500}
+
+.finale-form{margin:22px 0 28px;padding:22px;background:rgba(0,0,0,.4);border:1px dashed var(--b)}
+.finale-form label{display:block;font-family:var(--m);font-size:10px;letter-spacing:.3em;color:var(--wk);text-transform:uppercase;margin-bottom:8px}
+.finale-form input{width:100%;max-width:400px;background:#000;border:1px solid var(--b);color:var(--w);font-family:var(--m);font-size:14px;padding:10px 14px;outline:none;transition:border-color .2s}
+.finale-form input:focus,.finale-form input:focus-visible{border-color:var(--cy);box-shadow:0 0 0 2px rgba(0,240,255,.2)}
+.finale-form__hint{font-family:var(--m);font-size:10.5px;color:var(--wk);margin-top:8px;line-height:1.55}
+
+.finale-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.finale-btn{font-family:var(--m);font-size:11px;letter-spacing:.3em;padding:14px 26px;background:transparent;border:1px solid var(--b);color:var(--d);cursor:none;text-transform:uppercase;text-decoration:none;transition:all .25s;display:inline-flex;align-items:center;gap:10px}
+.finale-btn:hover:not(:disabled),.finale-btn:focus-visible{border-color:var(--cy);color:var(--cy);outline:none;transform:translateY(-2px)}
+.finale-btn--primary{border-color:var(--gd);color:var(--gd)}
+.finale-btn--primary:hover:not(:disabled),.finale-btn--primary:focus-visible{background:var(--gd);color:#000;box-shadow:0 0 30px rgba(255,204,61,.4)}
+.finale-btn--x{border-color:var(--cy);color:var(--cy)}
+.finale-btn--x:hover:not(:disabled),.finale-btn--x:focus-visible{background:var(--cy);color:#000}
+
+.finale-preview{margin-top:28px;padding:16px;background:#000;border:1px solid var(--b);overflow:hidden;text-align:center}
+.finale-preview svg{max-width:100%;height:auto;display:block;margin:0 auto}
+.finale-preview__l{font-family:var(--m);font-size:10px;color:var(--wk);letter-spacing:.25em;text-transform:uppercase;margin-bottom:10px}
+
+@media(max-width:720px){
+  .finale-card{padding:28px 22px}
+  .finale-actions{flex-direction:column}
+  .finale-btn{width:100%;justify-content:center}
+}
+
 /* ═══ v2.2 — Glossaire flottant ═══ */
 .gloss{border-bottom:1px dashed rgba(0,240,255,.55);cursor:none;color:inherit;transition:color .18s}
 .gloss:hover,.gloss:focus-visible{color:var(--cy);outline:none}

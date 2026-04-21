@@ -104,6 +104,28 @@
 </div>
 </section>
 
+<section id="ay-finale" aria-label="Certificat de fin de parcours">
+<div class="finale-card">
+  <div class="finale-kicker">◆ PARCOURS COMPLET · 6 / 6 CHAPITRES</div>
+  <h2 class="finale-h">Tu as <em>compris</em>.<br>Tu as ton <em>diplôme</em>.</h2>
+  <p class="finale-lede">Tu viens de traverser les six chapitres de l'Académie — du hash au smart contract. <strong>Tu ne repars pas avec un savoir vague, tu repars avec des réflexes.</strong> Ton certificat contient ton adresse wallet, la date, et une empreinte cryptographique unique de ton parcours. Il est généré localement : aucun serveur n'est au courant.</p>
+  <div class="finale-form">
+    <label for="finaleName">Nom ou pseudo (facultatif) pour ton certificat</label>
+    <input id="finaleName" type="text" maxlength="40" placeholder="Ada Lovelace, @votre_pseudo, Élève 2026…">
+    <p class="finale-form__hint">Laisse vide pour n'afficher que ton adresse wallet. Max 40 caractères.</p>
+  </div>
+  <div class="finale-preview">
+    <div class="finale-preview__l">▸ APERÇU DU CERTIFICAT</div>
+    <div id="finalePreview"></div>
+  </div>
+  <div class="finale-actions">
+    <button type="button" class="finale-btn finale-btn--primary" id="finaleDownload" data-hover>⤓ TÉLÉCHARGER LE SVG</button>
+    <button type="button" class="finale-btn finale-btn--x" id="finaleShare" data-hover>✦ PARTAGER SUR X</button>
+    <button type="button" class="finale-btn" id="finaleCopy" data-hover>⎘ COPIER L'EMPREINTE</button>
+  </div>
+</div>
+</section>
+
 <section id="ay-chapters">
 <div class="inner">
   <div class="sl rv">LE PARCOURS // 6 CHAPITRES</div>
@@ -211,5 +233,6 @@
 <script src="src/core.js"></script>
 <script src="src/extensions.js"></script>
 <script src="src/academy.js"></script>
+<script src="src/certificate.js"></script>
 </body>
 </html>
