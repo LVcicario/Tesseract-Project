@@ -457,6 +457,53 @@
     },true);
   }
 
+  // ═══ Hash sandbox (section concept) ═══
+  // Shows the avalanche effect: every character typed re-hashes the
+  // input through SHA-256 and highlights which hex digits flipped.
+  (function installHashSandbox(){
+    const input=$('hlInput'),out=$('hlHash'),diff=$('hlDiff'),reset=$('hlReset');
+    if(!input||!out)return;
+    let last='';
+    function hexDistance(a,b){
+      // Bit-level Hamming distance between two hex strings.
+      let d=0;const len=Math.min(a.length,b.length);
+      for(let i=0;i<len;i++){
+        let x=parseInt(a[i],16)^parseInt(b[i],16);
+        while(x){d+=x&1;x>>=1;}
+      }
+      return d;
+    }
+    async function renderHash(){
+      const v=input.value;
+      const h=v?await sha(v):'—'.repeat(32);
+      const spans=h.split('').map((c,i)=>{
+        const changed=last&&last.length===h.length&&last[i]!==c;
+        return '<span class="hx'+(changed?' changed':'')+'">'+c+'</span>';
+      }).join('');
+      out.innerHTML=spans;
+      if(diff&&last&&last.length===h.length){
+        const bd=hexDistance(last,h);
+        diff.innerHTML='Bits différents <strong>'+bd+' / 256</strong>';
+      }
+      last=h;
+    }
+    let pending=null;
+    input.addEventListener('input',()=>{
+      if(pending)clearTimeout(pending);
+      pending=setTimeout(renderHash,60);
+    });
+    if(reset)reset.addEventListener('click',()=>{
+      const samples=['Satoshi','satoshi','Satoshj','Blockchain','blockchain','TESSERACT','Tesseract','Nakamoto 2008','Nakamoto 2009'];
+      const pick=samples[Math.floor(Math.random()*samples.length)];
+      input.value=pick;renderHash();input.focus();
+    });
+    // Initial render without highlight noise.
+    sha(input.value).then(h=>{
+      last=h;
+      out.innerHTML=h.split('').map(c=>'<span class="hx">'+c+'</span>').join('');
+    });
+  })();
+
   // ═══ Onboarding first-run ═══
   // When a brand-new wallet was generated this session, greet the user
   // once the boot animation has settled. We persist a flag so the

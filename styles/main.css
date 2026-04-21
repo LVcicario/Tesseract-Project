@@ -403,6 +403,27 @@ body.glitch{animation:glitchAll .5s}
 .lboard-row.clickable{cursor:none;transition:background .2s}
 .lboard-row.clickable:hover{background:rgba(0,240,255,.05)}
 
+/* ═══ v2.2 — Hash sandbox (section concept) ═══ */
+.hashlab{margin-top:32px;padding:28px 28px 24px;background:rgba(5,8,19,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--b);position:relative}
+.hashlab::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cy),transparent);animation:sb 4s infinite}
+.hashlab-h{display:flex;justify-content:space-between;align-items:center;font-family:var(--m);font-size:10px;letter-spacing:.3em;color:var(--cy);text-transform:uppercase;margin-bottom:14px}
+.hashlab-reset{font-family:inherit;font-size:9px;letter-spacing:.22em;padding:5px 10px;background:transparent;border:1px solid var(--b);color:var(--wk);cursor:none;text-transform:uppercase;transition:all .2s}
+.hashlab-reset:hover,.hashlab-reset:focus{border-color:var(--cy);color:var(--cy);outline:none}
+.hashlab-intro{font-family:var(--m);font-size:12px;line-height:1.7;color:var(--d);margin-bottom:18px}
+.hashlab-intro strong{color:var(--w);font-weight:500}
+.hashlab-input{width:100%;background:#000;border:1px solid var(--b);color:var(--w);font-family:var(--m);font-size:15px;padding:14px 16px;outline:none;letter-spacing:.02em;transition:border-color .2s}
+.hashlab-input:focus,.hashlab-input:focus-visible{border-color:var(--cy);outline:none;box-shadow:0 0 0 2px rgba(0,240,255,.2)}
+.hashlab-hash{margin-top:14px;padding:16px 18px;background:#000;border:1px solid var(--b);font-family:var(--m);font-size:13px;line-height:1.55;color:var(--cy);word-break:break-all;letter-spacing:.02em;min-height:54px;display:flex;align-items:center;flex-wrap:wrap}
+.hashlab-hash .hx{display:inline-block;transition:color .18s,text-shadow .18s}
+.hashlab-hash .hx.changed{color:var(--mg);text-shadow:0 0 8px rgba(255,0,212,.6)}
+.hashlab-meta{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-top:12px;font-family:var(--m);font-size:10px;letter-spacing:.22em;color:var(--wk);text-transform:uppercase}
+.hashlab-meta strong{color:var(--cy);font-weight:600;letter-spacing:.05em}
+@media(max-width:720px){
+  .hashlab{padding:20px 18px}
+  .hashlab-hash{font-size:11px;padding:12px 14px}
+  .hashlab-meta{font-size:9px;gap:10px}
+}
+
 /* ═══ v2.2 — A11y helpers ═══ */
 .visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 :focus-visible{outline:2px solid var(--cy);outline-offset:2px}

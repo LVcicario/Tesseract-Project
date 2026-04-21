@@ -116,6 +116,14 @@
 </div>
 </div>
 </div>
+<div class="hashlab rv" aria-label="Sandbox SHA-256 — effet avalanche">
+  <div class="hashlab-h"><span>▸ LABORATOIRE SHA-256 // EFFET AVALANCHE</span><button class="hashlab-reset" id="hlReset" data-hover>↻ EXEMPLE</button></div>
+  <p class="hashlab-intro">Changez <strong>une seule lettre</strong> dans le texte ci-dessous. Le hash en dessous est entièrement recalculé. Imprévisible, déterministe, irréversible — c'est la brique fondatrice de toute blockchain.</p>
+  <label for="hlInput" class="visually-hidden">Texte à hacher</label>
+  <input id="hlInput" class="hashlab-input" type="text" autocomplete="off" spellcheck="false" value="Satoshi" aria-describedby="hlMeta">
+  <div class="hashlab-hash" id="hlHash" aria-live="polite" aria-atomic="true"></div>
+  <div class="hashlab-meta" id="hlMeta"><span>Algo <strong>SHA-256</strong></span><span>Sortie <strong>256 bits / 64 hex</strong></span><span id="hlDiff">Bits différents <strong>—</strong></span></div>
+</div>
 </div>
 </section>
 
