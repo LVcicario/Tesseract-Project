@@ -133,6 +133,13 @@ const bL=[
 {t:100,text:'▸ TESSERACT ONLINE. All systems nominal.',cls:'warn'}];
 
 async function runBoot(){
+  // Pages that don't include the boot DOM (e.g. academy.html) simply
+  // skip the boot sequence. We still dispatch tsc:bootComplete so
+  // extension features that hook into that milestone keep firing.
+  if(!document.getElementById('boot')||!document.getElementById('bootLog')){
+    setTimeout(()=>window.dispatchEvent(new CustomEvent('tsc:bootComplete')),400);
+    return;
+  }
   for(const l of bL){
     await new Promise(r=>setTimeout(r,l.t));
     const d=document.createElement('div');
@@ -161,7 +168,8 @@ async function runBoot(){
 }
 function revealHero(){
   const title='TESSERACT\nCHAIN';
-  const el=$('ht');el.innerHTML='';
+  const el=$('ht');if(!el)return;
+  el.innerHTML='';
   const letters=[];
   title.split('').forEach(ch=>{
     if(ch==='\n'){el.appendChild(document.createElement('br'));return}
@@ -531,6 +539,7 @@ async function mkBlk(mined=false){
 }
 
 function rBlk(b){
+  if(!cth)return;
   const d=document.createElement('div');
   d.className='bk'+(b.mined?' mine':'');
   d.innerHTML=`<div class="bh"><span>BLOCK #${String(b.index).padStart(5,'0')}</span><span style="color:var(--wk)">${b.timestamp}</span></div>
@@ -540,8 +549,9 @@ function rBlk(b){
 ${b.mined?'<div class="br"><strong class="hl">▸ MINÉ PAR VOUS</strong></div>':''}`;
   cth.appendChild(d);
   while(cth.children.length>25)cth.removeChild(cth.firstChild);
-  sbk.textContent=b.index+1;sTx+=b.txCount;
-  stx.textContent=sTx.toLocaleString('fr-FR');
+  if(sbk)sbk.textContent=b.index+1;
+  sTx+=b.txCount;
+  if(stx)stx.textContent=sTx.toLocaleString('fr-FR');
   const off=Math.max(0,cth.scrollWidth-cth.parentElement.clientWidth+40);
   cth.style.transform=`translateX(-${off}px)`;
 }
@@ -552,11 +562,13 @@ async function adB(m=false){
   rBlk(b);
   pVx(sIdx%16);pTs();sBlk();
 }
-(async()=>{for(let i=0;i<6;i++)await adB();setInterval(()=>adB(),4000)})();
+if(cth){(async()=>{for(let i=0;i<6;i++)await adB();setInterval(()=>adB(),4000)})();}
 
 let rSh=0,rTg=14000;
-setInterval(()=>{rTg=10000+Math.random()*8000},2200);
-setInterval(()=>{rSh+=(rTg-rSh)*.08;srt.textContent=Math.floor(rSh).toLocaleString('fr-FR')},60);
+if(srt){
+  setInterval(()=>{rTg=10000+Math.random()*8000},2200);
+  setInterval(()=>{rSh+=(rTg-rSh)*.08;srt.textContent=Math.floor(rSh).toLocaleString('fr-FR')},60);
+}
 
 // ═══ TAMPER ═══
 const tchE=$('tch'),tcsE=$('tcs'),rF=$('redFlood');
@@ -573,6 +585,7 @@ async function bTCh(){
 }
 
 function rTCh(){
+  if(!tchE)return;
   tchE.innerHTML='';
   tBlks.forEach((b,i)=>{
     const d=document.createElement('div');
@@ -631,8 +644,8 @@ async function rTmp(){
   tLog('✓ Chaîne restaurée. Immutabilité rétablie.','ok');
   sRM(0);sWin();
 }
-$('resetT').addEventListener('click',rTmp);
-bTCh();
+{const _rt=$('resetT');if(_rt)_rt.addEventListener('click',rTmp);}
+if(tchE)bTCh();
 
 // ═══ MINING ═══
 const mbtn=$('mbtn'),mcs=$('mcs'),lvn=$('lvn'),lvr=$('lvr'),lvt=$('lvt'),mid=$('mid');
@@ -751,7 +764,7 @@ async function rMine(){
   await new Promise(r=>setTimeout(r,1800));
   gMd=0;mbtn.disabled=false;mbtn.textContent='⧫ MINER UN AUTRE BLOC';
 }
-mbtn.addEventListener('click',rMine);
+if(mbtn)mbtn.addEventListener('click',rMine);
 
 // ═══ SCRAMBLE TYPE ═══
 function scrmb(el,dur=900){

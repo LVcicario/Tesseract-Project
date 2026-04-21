@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TESSERACT.CHAIN — Académie : apprendre la blockchain en 6 chapitres</title>
+<meta name="description" content="Parcours pédagogique interactif pour comprendre la blockchain. Six chapitres, des démonstrations réelles, un wallet qui vous suit, des défis à relever.">
+<meta name="theme-color" content="#00f0ff">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="TESSERACT.CHAIN — Académie">
+<meta property="og:description" content="Apprendre la blockchain en 6 chapitres — hash, blocs, Proof of Work, identités, consensus, smart contracts.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body data-page="academy">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN — Académie</h1><p>Ce parcours a besoin de JavaScript pour fonctionner. Activez-le, puis rechargez la page.</p></div></div></noscript>
+
+<!-- Overlays partagés -->
+<div id="chromAb" aria-hidden="true"></div>
+<div class="vertexmark" id="vmark" role="status" aria-live="polite" aria-label="Compteur de blocs minés">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span></div>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true">
+  <div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div>
+  <div id="xBody"></div>
+</aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X">
+  <button class="xclose" id="xrClose" data-hover>✕ SORTIR</button>
+  <h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3>
+  <pre id="xrDump">—</pre>
+</div>
+
+<!-- Flash & curseur partagés -->
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<!-- CLI partagé -->
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée. Tapez help pour la liste des commandes.</span></div>
+</div>
+
+<!-- HUD : même structure, label "EXPLORER LIBRE" pour revenir à l'accueil -->
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>ACADÉMIE</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="index.html" data-hover>◆ EXPLORER LIBRE</a>
+<span class="hwallet" id="hwallet" data-hover title="Votre wallet simulé — cliquez pour détails"><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<!-- Grille, canvas et indicateur de glossaire -->
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section id="ay-hero">
+<div class="inner">
+  <div class="hk rv" style="opacity:1;animation:none">◆ ACADÉMIE TESSERACT.CHAIN // PARCOURS GUIDÉ</div>
+  <h1 class="ay-title">Apprendre la<br><em>blockchain</em> en six chapitres.</h1>
+  <p class="ay-lede">Pas de jargon. Pas de cours magistral. <strong>Vous faites, vous voyez, vous comprenez.</strong> Chaque chapitre est une leçon courte, une démonstration réelle et un défi qui valide que ça a cliqué. Votre progression est sauvegardée localement — aucun compte, aucun serveur.</p>
+
+  <div class="ay-progress rv">
+    <div class="ay-progress__bar-wrap" aria-label="Progression dans le parcours">
+      <div class="ay-progress__bar" id="ayBar" style="width:0%"></div>
+    </div>
+    <div class="ay-progress__label"><span id="ayDone">0</span> / <span id="ayTotal">6</span> chapitres terminés</div>
+    <button class="ay-progress__reset" id="ayReset" type="button" data-hover>↻ RECOMMENCER</button>
+  </div>
+</div>
+</section>
+
+<section id="ay-chapters">
+<div class="inner">
+  <div class="sl rv">LE PARCOURS // 6 CHAPITRES</div>
+  <div class="ay-grid" id="ayGrid" aria-label="Liste des chapitres">
+    <a class="ay-card ay-card--soon" href="#" style="--c:#00f0ff" data-chapter="1" aria-label="Chapitre 1 — Le hash — bientôt disponible" data-hover>
+      <div class="ay-card__num">CHAPITRE 01 · ★ DÉBUTANT</div>
+      <div class="ay-card__title">Le hash</div>
+      <p class="ay-card__desc">Une fonction qui transforme n'importe quel texte en une empreinte unique de 256 bits. Déterministe, sensible, irréversible. La brique de tout ce qui suit.</p>
+      <div class="ay-card__meta"><span>≈ 10 min</span><strong>BIENTÔT</strong></div>
+    </a>
+    <a class="ay-card ay-card--soon" href="#" style="--c:#ff00d4" data-chapter="2" aria-label="Chapitre 2 — Le bloc — bientôt disponible" data-hover>
+      <div class="ay-card__num">CHAPITRE 02 · ★ DÉBUTANT</div>
+      <div class="ay-card__title">Le bloc</div>
+      <p class="ay-card__desc">Pourquoi chaîner les blocs par leur hash rend la falsification pratiquement impossible. L'immuabilité, expliquée sans incantation.</p>
+      <div class="ay-card__meta"><span>≈ 12 min</span><strong>BIENTÔT</strong></div>
+    </a>
+    <a class="ay-card ay-card--soon" href="#" style="--c:#8b5cf6" data-chapter="3" aria-label="Chapitre 3 — La course au nonce — bientôt disponible" data-hover>
+      <div class="ay-card__num">CHAPITRE 03 · ★★ INTERMÉDIAIRE</div>
+      <div class="ay-card__title">La course au nonce</div>
+      <p class="ay-card__desc">Comment le Proof of Work transforme de l'électricité en sécurité. Votre CPU participe réellement — vous ressentez l'effort.</p>
+      <div class="ay-card__meta"><span>≈ 15 min</span><strong>BIENTÔT</strong></div>
+    </a>
+    <a class="ay-card ay-card--soon" href="#" style="--c:#ffcc3d" data-chapter="4" aria-label="Chapitre 4 — Les identités — bientôt disponible" data-hover>
+      <div class="ay-card__num">CHAPITRE 04 · ★★ INTERMÉDIAIRE</div>
+      <div class="ay-card__title">Les identités</div>
+      <p class="ay-card__desc">Clé privée, clé publique, signature. Comment prouver que c'est bien vous qui parlez, sans jamais dévoiler votre mot de passe.</p>
+      <div class="ay-card__meta"><span>≈ 12 min</span><strong>BIENTÔT</strong></div>
+    </a>
+    <a class="ay-card ay-card--soon" href="#" style="--c:#00ff88" data-chapter="5" aria-label="Chapitre 5 — Le consensus — bientôt disponible" data-hover>
+      <div class="ay-card__num">CHAPITRE 05 · ★★★ AVANCÉ</div>
+      <div class="ay-card__title">Le consensus</div>
+      <p class="ay-card__desc">Plusieurs nœuds, aucune autorité centrale, un réseau qui se met quand même d'accord. Byzantins, majorité, forks.</p>
+      <div class="ay-card__meta"><span>≈ 15 min</span><strong>BIENTÔT</strong></div>
+    </a>
+    <a class="ay-card ay-card--soon" href="#" style="--c:#ff2244" data-chapter="6" aria-label="Chapitre 6 — Les programmes — bientôt disponible" data-hover>
+      <div class="ay-card__num">CHAPITRE 06 · ★★★ AVANCÉ</div>
+      <div class="ay-card__title">Les programmes</div>
+      <p class="ay-card__desc">Le code qui vit sur la chaîne. Smart contracts, gas, déterminisme. Vous en déployez un, vous l'appelez, vous voyez l'état évoluer.</p>
+      <div class="ay-card__meta"><span>≈ 18 min</span><strong>BIENTÔT</strong></div>
+    </a>
+  </div>
+</div>
+</section>
+
+<section id="ay-pedago">
+<div class="inner">
+  <div class="sl rv">PRINCIPE // COMMENT ON APPREND</div>
+  <h2 class="st rv">Cinq temps par chapitre.</h2>
+  <div class="ay-loop rv">
+    <div class="ay-step"><div class="ay-step__n">01</div><div class="ay-step__t">Raconter</div><p>Pourquoi ce concept existe, quel problème il résout.</p></div>
+    <div class="ay-step"><div class="ay-step__n">02</div><div class="ay-step__t">Montrer</div><p>Une démonstration animée ou un exemple vivant en arrière-plan.</p></div>
+    <div class="ay-step"><div class="ay-step__n">03</div><div class="ay-step__t">Faire</div><p>Vous manipulez directement et voyez l'effet immédiat.</p></div>
+    <div class="ay-step"><div class="ay-step__n">04</div><div class="ay-step__t">Défier</div><p>Un mini-exercice avec validation automatique. Feedback immédiat.</p></div>
+    <div class="ay-step"><div class="ay-step__n">05</div><div class="ay-step__t">Retenir</div><p>Un résumé, un glossaire accessible à tout moment, un quiz express.</p></div>
+  </div>
+</div>
+</section>
+
+<section id="ay-promises">
+<div class="inner">
+  <div class="sl rv">PROMESSES // CE QUE CE PARCOURS EST ET N'EST PAS</div>
+  <div class="ay-promise-grid rv">
+    <div class="ay-promise">
+      <div class="ay-promise__t ay-promise__t--yes">✓ Ce que c'est</div>
+      <ul>
+        <li>Un parcours pour <strong>comprendre</strong>, pas pour spéculer.</li>
+        <li>Du code réel (SHA-256 natif, Web Crypto, aucun mock).</li>
+        <li>Gratuit, libre, sans compte, sans tracking.</li>
+        <li>Pensé pour les <strong>15–25 ans curieux</strong>, ouvert à tous.</li>
+      </ul>
+    </div>
+    <div class="ay-promise">
+      <div class="ay-promise__t ay-promise__t--no">✕ Ce que ce n'est pas</div>
+      <ul>
+        <li>Un conseil d'investissement. <strong>Jamais.</strong></li>
+        <li>Une formation exhaustive (modèle simplifié, assumé).</li>
+        <li>Un substitut à un whitepaper — plutôt une porte d'entrée.</li>
+        <li>Un tutoriel Solidity / Rust / Move. Les contrats ici sont pédagogiques.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Académie — un parcours interactif pour apprendre la blockchain. Minage réel (Web Crypto API), post-processing WebGL, audio génératif (Tone.js).</p>
+</div>
+<div class="fc"><h4>Parcours</h4><ul><li>▸ Chapitre 1 — Le hash</li><li>▸ Chapitre 2 — Le bloc</li><li>▸ Chapitre 3 — La course au nonce</li><li>▸ Chapitre 4 — Les identités</li><li>▸ Chapitre 5 — Le consensus</li><li>▸ Chapitre 6 — Les programmes</li></ul></div>
+<div class="fc"><h4>Ressources</h4><ul><li>▸ Bitcoin whitepaper</li><li>▸ Ethereum whitepaper</li><li>▸ Cosmos IBC</li><li>▸ Polkadot XCM</li></ul></div>
+<div class="fc"><h4>Contrôles</h4><ul><li>▸ ² ou ~ : CLI</li><li>▸ Esc : fermer overlay</li><li>▸ clic terme souligné : glossaire</li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN — ACADÉMIE // MIT</span><span id="fcrd">PROG 0/6</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="src/lifecycle.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/core.js"></script>
+<script src="src/extensions.js"></script>
+<!-- academy.js : progression + glossaire, ajouté dans PA.2 -->
+</body>
+</html>
