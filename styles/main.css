@@ -786,6 +786,60 @@ body[data-page="academy"] #boot,body[data-page="academy"] .shint{display:none!im
 .ch6-log__line.ko{color:var(--rd)}
 .ch6-log__line .ts{color:var(--wk);font-size:10px;margin-right:8px}
 
+/* ═══ v2.3 — Pages institutionnelles (about / docs / changelog / 404) ═══ */
+.inst-hero{padding:120px 36px 40px}
+.inst-hero .inner{max-width:920px}
+.inst-hero h1{font-family:var(--dp);font-size:clamp(56px,8vw,112px);font-weight:900;line-height:.92;letter-spacing:-.02em;margin:18px 0 24px;background:linear-gradient(180deg,#fff 0%,#fff 32%,var(--cy) 70%,var(--vi) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(var(--glow-hero) rgba(0,240,255,.2));text-transform:uppercase}
+.inst-hero h1 em{font-style:normal;color:var(--cy)}
+.inst-hero .lede{font-size:18px;line-height:1.75;color:var(--d);max-width:720px;font-weight:300}
+.inst-hero .lede strong{color:var(--w);font-weight:500}
+.inst-section{padding:40px 36px 70px}
+.inst-section .inner{max-width:920px}
+.inst-section h2{font-family:var(--dp);font-size:clamp(28px,3.4vw,44px);font-weight:800;letter-spacing:-.01em;color:var(--w);text-transform:uppercase;margin:34px 0 18px}
+.inst-section h2 em{font-style:normal;color:var(--cy)}
+.inst-section h3{font-family:var(--m);font-size:12px;letter-spacing:.28em;color:var(--cy);text-transform:uppercase;margin:26px 0 12px}
+.inst-section p{font-size:15px;line-height:1.8;color:var(--d);margin:10px 0}
+.inst-section p strong{color:var(--w);font-weight:500}
+.inst-section ul{list-style:none;margin:12px 0 22px;padding:0}
+.inst-section li{font-size:14.5px;line-height:1.75;color:var(--d);padding-left:22px;position:relative;margin-bottom:10px}
+.inst-section li::before{content:'▸';position:absolute;left:0;color:var(--cy)}
+.inst-section li strong{color:var(--w);font-weight:500}
+.inst-section code{color:var(--cy);font-family:var(--m);font-size:13px;padding:2px 6px;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.18)}
+.inst-section pre{background:#000;border:1px solid var(--b);padding:18px;margin:16px 0;overflow-x:auto;font-family:var(--m);font-size:12.5px;line-height:1.7;color:var(--d)}
+.inst-section pre code{background:none;border:none;padding:0}
+.inst-card{padding:26px 28px;background:rgba(5,8,19,.55);backdrop-filter:blur(var(--blur-md));-webkit-backdrop-filter:blur(var(--blur-md));border:1px solid var(--b);margin:18px 0}
+.inst-card h3{margin-top:0}
+.inst-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:18px}
+.inst-grid .inst-card{margin:0}
+
+/* Docs — key / command reference table */
+.doc-table{display:grid;grid-template-columns:180px 1fr;gap:0;border:1px solid var(--b);background:rgba(5,8,19,.4);margin:12px 0 26px;font-family:var(--m);font-size:12.5px}
+.doc-table>div{padding:10px 14px;border-bottom:1px dashed var(--b)}
+.doc-table>div:nth-last-child(-n+2){border-bottom:none}
+.doc-table .k{color:var(--cy);border-right:1px dashed var(--b);font-weight:600}
+.doc-table .v{color:var(--d);line-height:1.55}
+.doc-table .v strong{color:var(--w);font-weight:500}
+@media(max-width:720px){.doc-table{grid-template-columns:1fr}.doc-table .k{border-right:none;border-bottom:1px dashed var(--b)!important}}
+
+/* Changelog timeline */
+.cl-stream{position:relative;margin:30px 0;padding-left:28px}
+.cl-stream::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--cy),var(--mg),var(--vi))}
+.cl-release{position:relative;padding:20px 0 24px}
+.cl-release::before{content:'';position:absolute;left:-28px;top:26px;width:13px;height:13px;border-radius:50%;background:var(--c,var(--cy));box-shadow:0 0 16px var(--c,var(--cy));border:2px solid #000}
+.cl-release h3{display:flex;align-items:baseline;gap:14px;font-family:var(--dp);font-size:26px;color:var(--w);letter-spacing:-.01em;text-transform:uppercase;margin:0 0 8px}
+.cl-release h3 .tag{font-family:var(--m);font-size:10px;letter-spacing:.28em;color:var(--c,var(--cy));border:1px solid var(--c,var(--cy));padding:3px 9px;text-transform:uppercase}
+.cl-release h3 .date{font-family:var(--m);font-size:11px;color:var(--wk);letter-spacing:.22em;font-weight:400}
+.cl-release p.cl-summary{font-size:14px;color:var(--d);line-height:1.65;margin:6px 0 12px}
+.cl-release ul li{font-size:13.5px;margin-bottom:6px}
+
+/* 404 page */
+.nf{min-height:calc(100vh - 80px);display:flex;align-items:center;justify-content:center;padding:40px;text-align:center}
+.nf__wrap{max-width:620px}
+.nf__n{font-family:var(--dp);font-size:clamp(140px,22vw,240px);font-weight:900;line-height:.8;letter-spacing:-.04em;margin:0 0 20px;background:linear-gradient(180deg,var(--cy) 0%,var(--mg) 60%,var(--vi) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 60px rgba(0,240,255,.3))}
+.nf__t{font-family:var(--dp);font-size:clamp(28px,4vw,48px);color:var(--w);letter-spacing:-.01em;text-transform:uppercase;margin:0 0 16px}
+.nf__lede{font-size:16px;line-height:1.7;color:var(--d);margin-bottom:30px}
+.nf__links{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
 /* ═══ v2.2 — Glossaire flottant ═══ */
 .gloss{border-bottom:1px dashed rgba(0,240,255,.55);cursor:none;color:inherit;transition:color .18s}
 .gloss:hover,.gloss:focus-visible{color:var(--cy);outline:none}

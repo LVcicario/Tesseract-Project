@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentation · TESSERACT.CHAIN</title>
+<meta name="description" content="Référence technique complète : commandes CLI, raccourcis clavier, easter eggs, API window.TSC*, structure du code.">
+<meta name="theme-color" content="#00f0ff">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Documentation · TESSERACT.CHAIN">
+<meta property="og:description" content="Référence technique pour utilisateurs et contributeurs.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="assets/og-image.svg">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="canonical" href="./docs.html">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body data-page="inst">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN</h1><p>JavaScript requis pour afficher le tesseract.</p></div></div></noscript>
+
+<div id="chromAb" aria-hidden="true"></div>
+<button type="button" class="vertexmark" id="vmark" aria-label="Blocs minés — cliquez pour voir vos statistiques">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span><span class="vertexmark__hint">▸ CLIC POUR DÉTAIL</span></button>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true"><div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div><div id="xBody"></div></aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X"><button class="xclose" id="xrClose" data-hover>✕ SORTIR</button><h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3><pre id="xrDump">—</pre></div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée.</span></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>DOCS</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="index.html" data-hover>◆ EXPLORER</a>
+<a class="hb hb--nav" href="academy.html" data-hover>◆ ACADÉMIE</a>
+<span class="hwallet" id="hwallet" data-hover><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section class="inst-hero">
+<div class="inner">
+  <div class="ch-num" style="color:var(--cy)">DOCUMENTATION // RÉFÉRENCE COMPLÈTE</div>
+  <h1>Tout ce qu'il<br>faut <em>savoir</em>.</h1>
+  <p class="lede">Cette page est la référence officielle. <strong>Raccourcis clavier</strong>, <strong>commandes CLI</strong>, <strong>easter eggs</strong>, <strong>API JavaScript</strong> exposée pour le debug, <strong>structure du code</strong>. À garder ouverte à côté si vous explorez sérieusement.</p>
+</div>
+</section>
+
+<section class="inst-section">
+<div class="inner">
+
+  <h2>Raccourcis <em>clavier</em></h2>
+  <div class="doc-table">
+    <div class="k">²  ou  ~  ou  @</div><div class="v">Ouvrir / fermer le <strong>terminal CLI</strong>. La touche <code>²</code> existe sur AZERTY, <code>~</code> et <code>@</code> sur QWERTY.</div>
+    <div class="k">Esc</div><div class="v">Fermer le CLI, l'explorateur de bloc, le mode rayons-X, ou tout modal ouvert.</div>
+    <div class="k">↑ ↑ ↓ ↓ ← → ← → B A</div><div class="v">Code Konami → active / désactive le <strong>mode rayons-X</strong> (dump JSON de l'état interne en direct).</div>
+    <div class="k">Tab</div><div class="v">Parcours au clavier de tous les éléments interactifs. Focus ring cyan visible.</div>
+    <div class="k">Entrée / Espace</div><div class="v">Active le contrôle focalisé (boutons, wallet HUD, nœuds consensus…).</div>
+    <div class="k">Souris — drag</div><div class="v">Faire tourner le tesseract (3D).</div>
+    <div class="k">Shift + drag</div><div class="v">Tourner le tesseract sur son <strong>axe W</strong> (4ᵉ dimension).</div>
+  </div>
+
+  <h2>Commandes <em>CLI</em></h2>
+  <h3>Moteur Explorer</h3>
+  <div class="doc-table">
+    <div class="k">help</div><div class="v">Affiche la liste complète.</div>
+    <div class="k">mine</div><div class="v">Scroll vers la section Mining et lance le minage.</div>
+    <div class="k">tamper</div><div class="v">Scroll vers la section Tamper et altère le bloc #001 automatiquement.</div>
+    <div class="k">reset</div><div class="v">Réinitialise la chaîne de démonstration.</div>
+    <div class="k">fly &lt;section&gt;</div><div class="v">Navigue vers <code>hero</code>, <code>concept</code>, <code>dim</code>, <code>time</code>, <code>sim</code>, <code>tamper</code>, <code>mine</code>, <code>outro</code>.</div>
+    <div class="k">audio</div><div class="v">Bascule l'audio génératif (Tone.js).</div>
+    <div class="k">nodes</div><div class="v">Affiche l'état réseau simulé.</div>
+    <div class="k">hash &lt;texte&gt;</div><div class="v">Calcule le SHA-256 d'une chaîne via Web Crypto API.</div>
+    <div class="k">pulse</div><div class="v">Fait pulser le tesseract manuellement.</div>
+    <div class="k">red</div><div class="v">Bascule en mode alerte (éphémère).</div>
+    <div class="k">clear / exit</div><div class="v">Efface l'historique du terminal / ferme.</div>
+  </div>
+  <h3>Extensions v2.1 (wallet, VM, consensus)</h3>
+  <div class="doc-table">
+    <div class="k">wallet</div><div class="v">Infos détaillées de votre wallet.</div>
+    <div class="k">balance</div><div class="v">Solde TSC courant.</div>
+    <div class="k">stake &lt;n&gt;</div><div class="v">Mise <code>n</code> TSC — simulation PoS, restitué après 4 s.</div>
+    <div class="k">deploy counter</div><div class="v">Déploie un contrat compteur.</div>
+    <div class="k">deploy vote</div><div class="v">Déploie un contrat de vote binaire.</div>
+    <div class="k">call &lt;addr&gt; &lt;method&gt; [args…]</div><div class="v">Appelle une méthode d'un contrat déployé.</div>
+    <div class="k">contracts</div><div class="v">Liste les contrats déployés cette session.</div>
+    <div class="k">mempool</div><div class="v">Dump des transactions en attente.</div>
+    <div class="k">explore &lt;n&gt;</div><div class="v">Ouvre l'explorateur de bloc sur le bloc #n de votre leaderboard.</div>
+    <div class="k">byzantine on|off</div><div class="v">Simule ~46 nœuds malveillants (passe online à 210/256).</div>
+    <div class="k">xray</div><div class="v">Bascule le mode rayons-X.</div>
+  </div>
+
+  <h2>API <em>JavaScript</em> exposée</h2>
+  <p>Ouvre la console du navigateur (F12) et joue avec ces objets globaux :</p>
+  <pre><code>window.TSC                // Store interne v2.1 (wallet, chain, mempool, …)
+window.TSCCore            // Moteur explorer — difficulté, horloge
+window.TSCCore.setDifficulty(n)  // 2 ≤ n ≤ 6
+window.TSCCore.getDifficulty()   // '0000'
+window.TSCUi              // Primitives UI
+window.TSCUi.toast(msg, { level, duration })
+window.TSCUi.modal({ title, body, actions })
+window.TSCUi.safeSetItem(key, value)
+window.TSCAcademy         // Progression académie
+window.TSCAcademy.state   // Snapshot figé
+window.TSCAcademy.reset()
+window.TSCAcademy.markChapterDone(n)
+window.TSCAcademy.glossary.show(term, anchor)
+window.TSCLifecycle       // Registre timers
+window.TSCLifecycle.intervals  // Set&lt;id&gt;
+window.TSCLifecycle.cleanup()  // Tout annuler manuellement</code></pre>
+
+  <h2>Easter <em>eggs</em></h2>
+  <ul>
+    <li><strong>Code Konami</strong> → mode rayons-X plein écran. Les initiés savent pourquoi <code>↑↑↓↓←→←→BA</code>.</li>
+    <li><strong>Clic sur "SOMMETS ILLUMINÉS"</strong> en haut-gauche → récap complet de votre activité de minage.</li>
+    <li><strong>Clic sur un bloc du leaderboard</strong> de minage → panneau explorer slide-in avec merkle root visualisé en arbre binaire.</li>
+    <li><strong>Clic sur le wallet HUD</strong> → modal détail avec bouton « copier l'adresse ».</li>
+    <li><strong>Glossaire flottant</strong> → cliquez n'importe quel mot souligné cyan dans le corps du texte.</li>
+  </ul>
+
+  <h2>Stack <em>technique</em></h2>
+  <div class="doc-table">
+    <div class="k">Rendu 3D/4D</div><div class="v">Three.js r128 (CDN avec SRI)</div>
+    <div class="k">Audio</div><div class="v">Tone.js 14.8.49 (CDN avec SRI)</div>
+    <div class="k">Cryptographie</div><div class="v">Web Crypto API native (SHA-256, ECDSA P-256)</div>
+    <div class="k">Stockage</div><div class="v">localStorage (wallet, leaderboard, progression, onboarding)</div>
+    <div class="k">Style</div><div class="v">CSS pur, variables CSS, backdrop-filter avec @supports</div>
+    <div class="k">Typographie</div><div class="v">Impact + SF Mono + system fonts (zéro @font-face)</div>
+    <div class="k">Build</div><div class="v">Aucun. Pas de transpiler, pas de bundler, pas de npm install.</div>
+    <div class="k">Déploiement</div><div class="v">GitHub Pages auto via Actions (workflow deploy.yml)</div>
+  </div>
+
+  <h2>Structure du <em>code</em></h2>
+  <pre><code>src/
+├── lifecycle.js      Registry timers/rAF/AudioContext — cleanup on pagehide
+├── ui.js             Toast + modal + safeSetItem wrappers
+├── core.js           Moteur Explorer (tesseract, mining, tamper, CLI, audio)
+├── extensions.js     v2.1 (wallet, VM, cinematic, explorer, mempool)
+├── academy.js        Progression + glossaire + API challenges
+├── chapter-1.js      Le hash — live sandbox + défi 00
+├── chapter-2.js      Le bloc — cascade réparable
+├── chapter-3.js      Course au nonce — mineur 3/4/5 zéros
+├── chapter-4.js      Identités — ECDSA P-256 sign/verify/tamper
+├── chapter-5.js      Consensus — 5 nœuds + byzantins
+└── chapter-6.js      Programmes — VM Counter avec gas</code></pre>
+
+  <h2>Données <em>stockées</em> dans votre navigateur</h2>
+  <p>Tout est local. Effacez en une ligne de console : <code>localStorage.clear()</code>.</p>
+  <div class="doc-table">
+    <div class="k">tsc.wallet.v1</div><div class="v">Adresse, clé privée simulée, solde TSC, date de création.</div>
+    <div class="k">tsc.lb.v1</div><div class="v">Leaderboard des blocs que vous avez minés (max 16).</div>
+    <div class="k">tsc.onboarded.v1</div><div class="v">Flag booléen — empêche de re-déclencher l'onboarding.</div>
+    <div class="k">tsc.academy.progress.v1</div><div class="v">État des 6 chapitres (démarré, terminé, score quiz, défis validés).</div>
+  </div>
+
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Documentation technique. Ouvrez la console pour explorer les API exposées.</p>
+</div>
+<div class="fc"><h4>Découvrir</h4><ul><li>▸ <a href="index.html" style="color:inherit;text-decoration:none">Explorer libre</a></li><li>▸ <a href="academy.html" style="color:inherit;text-decoration:none">Académie</a></li></ul></div>
+<div class="fc"><h4>Projet</h4><ul><li>▸ <a href="about.html" style="color:inherit;text-decoration:none">À propos</a></li><li>▸ <strong style="color:var(--cy)">Documentation</strong></li><li>▸ <a href="changelog.html" style="color:inherit;text-decoration:none">Changelog</a></li></ul></div>
+<div class="fc"><h4>Code</h4><ul><li>▸ <a href="https://github.com/LVcicario/Tesseract-Project" style="color:inherit;text-decoration:none">GitHub</a></li><li>▸ <a href="LICENSE" style="color:inherit;text-decoration:none">MIT</a></li><li>▸ <a href="CONTRIBUTING.md" style="color:inherit;text-decoration:none">Contribuer</a></li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN // DOCS</span><span id="fcrd">—</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha384-c6Uo4N9c3SOEigMVzP6IshUG1wQ5uMp3xeoQFiHWAQ86joWdgyajkvopySyKy/Z6" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="src/lifecycle.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/core.js"></script>
+<script src="src/extensions.js"></script>
+<script src="src/academy.js"></script>
+</body>
+</html>

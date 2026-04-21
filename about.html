@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>À propos · TESSERACT.CHAIN</title>
+<meta name="description" content="TESSERACT.CHAIN — exploration interactive et parcours pédagogique pour comprendre la blockchain. Histoire, philosophie, auteur.">
+<meta name="theme-color" content="#00f0ff">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="À propos · TESSERACT.CHAIN">
+<meta property="og:description" content="Un outil d'exploration et d'apprentissage de la blockchain, conçu avec soin. Histoire, stack, philosophie.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="assets/og-image.svg">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="canonical" href="./about.html">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body data-page="inst">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN</h1><p>Cette page a besoin de JavaScript pour afficher le tesseract en arrière-plan. Activez-le, puis rechargez.</p></div></div></noscript>
+
+<div id="chromAb" aria-hidden="true"></div>
+<button type="button" class="vertexmark" id="vmark" aria-label="Blocs minés — cliquez pour voir vos statistiques">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span><span class="vertexmark__hint">▸ CLIC POUR DÉTAIL</span></button>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true"><div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div><div id="xBody"></div></aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X"><button class="xclose" id="xrClose" data-hover>✕ SORTIR</button><h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3><pre id="xrDump">—</pre></div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée.</span></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>À PROPOS</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="index.html" data-hover>◆ EXPLORER</a>
+<a class="hb hb--nav" href="academy.html" data-hover>◆ ACADÉMIE</a>
+<span class="hwallet" id="hwallet" data-hover><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section class="inst-hero">
+<div class="inner">
+  <div class="ch-num" style="color:var(--cy)">À PROPOS // PROJET &amp; AUTEUR</div>
+  <h1>Pourquoi <em>cet</em> objet.</h1>
+  <p class="lede">TESSERACT.CHAIN a commencé comme une <strong>démonstration artistique</strong> et s'est transformé en <strong>outil pédagogique</strong>. Sa promesse tient en deux phrases : faire <em>ressentir</em> la blockchain avant de la faire <em>comprendre</em>, et faire la <em>comprendre</em> sans jamais trahir la science qu'il y a derrière.</p>
+</div>
+</section>
+
+<section class="inst-section">
+<div class="inner">
+
+  <h2>La <em>mission</em></h2>
+  <p>La blockchain est devenue un mot valise. Pour la moitié du public, c'est « la crypto ». Pour l'autre moitié, c'est un concept flou évoqué par les médias sans jamais montrer comment ça marche. Entre les deux, un trou pédagogique énorme — et des apprenants (lycéens, étudiants en informatique, curieux adultes) qui méritent mieux qu'une vidéo Youtube en cinq minutes.</p>
+  <p>Ce site existe pour combler ce trou avec deux portes :</p>
+  <div class="inst-grid">
+    <div class="inst-card">
+      <h3>🚀 Explorer libre</h3>
+      <p>Pour la personne qui passe 3 minutes et veut repartir avec une image forte en tête. Tesseract 4D, minage qui tourne sous ses yeux, terminal qui répond. <strong>Pas d'obligation d'apprendre</strong> — juste ressentir que quelque chose de vrai se passe.</p>
+    </div>
+    <div class="inst-card">
+      <h3>🎓 Académie</h3>
+      <p>Pour la personne qui veut <strong>vraiment comprendre</strong>. Six chapitres de 10 à 18 minutes, des défis validés automatiquement, un quizz à la fin. Commencer au hash, finir aux smart contracts. Progression sauvegardée localement.</p>
+    </div>
+  </div>
+
+  <h2>La <em>philosophie</em></h2>
+  <p>Trois principes sous-tendent chaque décision technique et pédagogique :</p>
+  <ul>
+    <li><strong>Rien ne quitte ton navigateur.</strong> Pas de compte, pas de serveur, pas d'analytics, pas de cookies. Le wallet, la progression, les blocs minés — tout vit dans <code>localStorage</code>.</li>
+    <li><strong>Code réel, pas simulé.</strong> SHA-256 via <code>SubtleCrypto</code>, signatures ECDSA P-256 authentiques, mining qui charge vraiment ton CPU. On utilise le vrai matériel cryptographique du navigateur, pas des simulations.</li>
+    <li><strong>Simplicité radicale.</strong> Zéro framework, zéro build, zéro transpileur. HTML + CSS + JavaScript natif. Fork, ouvre <code>index.html</code>, ça marche.</li>
+  </ul>
+
+  <h2>L'<em>auteur</em></h2>
+  <p>Développé par <strong><a href="https://github.com/LVcicario" style="color:var(--cy);text-decoration:none">Luca Vicario</a></strong>, avec une aide substantielle de Claude (Anthropic) pour la partie visuelle initiale. Le projet est maintenu comme un bien commun : licence MIT, contributions bienvenues.</p>
+  <p>Le site n'existe pas pour vendre quoi que ce soit. Il n'y a <strong>aucun token</strong> (les « TSC » affichés sont purement décoratifs), <strong>aucun partenariat</strong>, <strong>aucun conseil d'investissement</strong>. Si vous voulez me payer, faites-le en forkant, en contribuant, ou en partageant à quelqu'un qui a besoin de comprendre.</p>
+
+  <h2>Les <em>choix</em> et leurs <em>limites</em></h2>
+  <p>Ce qu'on assume :</p>
+  <ul>
+    <li>Le texte est <strong>en français</strong>. Une version anglaise est à l'étude mais pas prioritaire — il existe déjà plein de ressources en anglais, moins en français.</li>
+    <li>Les démonstrations sont <strong>simplifiées</strong>. Vraie EVM, vraie difficulté Bitcoin, vrai Proof of Stake Ethereum sont plus subtils que ce qui est montré ici. Chaque chapitre le mentionne explicitement.</li>
+    <li>L'interface est <strong>chargée</strong>. Tesseract 4D, audio génératif, HUD, CLI — c'est volontaire : la DA sert la mémorisation. Les modes <code>prefers-reduced-motion</code> allègent ce qui peut l'être.</li>
+  </ul>
+  <p>Ce qu'on refuse :</p>
+  <ul>
+    <li>Aucun <strong>conseil d'investissement</strong>. Jamais. Même si vous insistez dans une issue GitHub.</li>
+    <li>Aucun <strong>tracking</strong>. Pas d'analytics, pas de pixel Facebook, pas de Hotjar. Rien.</li>
+    <li>Aucun <strong>partenariat rémunéré</strong> avec un projet crypto, un échange, un wallet. Indépendance totale.</li>
+  </ul>
+
+  <h2>Comment <em>contribuer</em></h2>
+  <p>Bug, coquille, proposition pédagogique, traduction, nouveau chapitre : tout est bienvenu. Lisez <a href="CONTRIBUTING.md" style="color:var(--cy);text-decoration:none"><code>CONTRIBUTING.md</code></a> pour le cadre, puis ouvrez une issue ou une PR. Le code est petit et lisible, le ticket d'entrée est bas.</p>
+
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Un objet pédagogique et artistique pour comprendre la blockchain. Open-source, sans compte, sans serveur.</p>
+</div>
+<div class="fc"><h4>Découvrir</h4><ul><li>▸ <a href="index.html" style="color:inherit;text-decoration:none">Explorer libre</a></li><li>▸ <a href="academy.html" style="color:inherit;text-decoration:none">Académie</a></li></ul></div>
+<div class="fc"><h4>Projet</h4><ul><li>▸ <strong style="color:var(--cy)">À propos</strong></li><li>▸ <a href="docs.html" style="color:inherit;text-decoration:none">Documentation</a></li><li>▸ <a href="changelog.html" style="color:inherit;text-decoration:none">Changelog</a></li></ul></div>
+<div class="fc"><h4>Code</h4><ul><li>▸ <a href="https://github.com/LVcicario/Tesseract-Project" style="color:inherit;text-decoration:none">GitHub</a></li><li>▸ <a href="LICENSE" style="color:inherit;text-decoration:none">MIT</a></li><li>▸ <a href="CONTRIBUTING.md" style="color:inherit;text-decoration:none">Contribuer</a></li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN // À PROPOS</span><span id="fcrd">—</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha384-c6Uo4N9c3SOEigMVzP6IshUG1wQ5uMp3xeoQFiHWAQ86joWdgyajkvopySyKy/Z6" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="src/lifecycle.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/core.js"></script>
+<script src="src/extensions.js"></script>
+<script src="src/academy.js"></script>
+</body>
+</html>

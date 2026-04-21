@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Changelog · TESSERACT.CHAIN</title>
+<meta name="description" content="Historique complet des versions, de l'artifact initial à la v3.0 Académie.">
+<meta name="theme-color" content="#00f0ff">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Changelog · TESSERACT.CHAIN">
+<meta property="og:description" content="Timeline v1 → v3.0. Chaque version, sa motivation et ses ajouts.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="assets/og-image.svg">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="canonical" href="./changelog.html">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body data-page="inst">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN</h1><p>JavaScript requis.</p></div></div></noscript>
+
+<div id="chromAb" aria-hidden="true"></div>
+<button type="button" class="vertexmark" id="vmark" aria-label="Blocs minés — cliquez pour voir vos statistiques">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span><span class="vertexmark__hint">▸ CLIC POUR DÉTAIL</span></button>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true"><div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div><div id="xBody"></div></aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X"><button class="xclose" id="xrClose" data-hover>✕ SORTIR</button><h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3><pre id="xrDump">—</pre></div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée.</span></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>CHANGELOG</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="index.html" data-hover>◆ EXPLORER</a>
+<a class="hb hb--nav" href="academy.html" data-hover>◆ ACADÉMIE</a>
+<span class="hwallet" id="hwallet" data-hover><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section class="inst-hero">
+<div class="inner">
+  <div class="ch-num" style="color:var(--cy)">HISTORIQUE // V1 → V3.0</div>
+  <h1>Ce qui <em>a changé</em>,<br>et pourquoi.</h1>
+  <p class="lede">Le projet est né d'une conversation avec Claude Artifacts. Depuis, il a bougé vite. Cette page trace les étapes. Chaque version répond à une question que le projet s'est posée en chemin.</p>
+</div>
+</section>
+
+<section class="inst-section">
+<div class="inner">
+  <div class="cl-stream">
+
+    <div class="cl-release" style="--c:#ff2244">
+      <h3>v3.0 <span class="tag">ACADÉMIE</span> <span class="date">2026-04</span></h3>
+      <p class="cl-summary"><strong>La question :</strong> comment faire de ce site un outil pédagogique pour les 15–25 ans curieux de blockchain ?</p>
+      <ul>
+        <li>Deuxième porte d'entrée : <code>academy.html</code> + 6 chapitres complets (hash, bloc, PoW, identités, consensus, smart contracts)</li>
+        <li>Chaque chapitre suit un <strong>modèle pédagogique en 5 temps</strong> (Raconter / Montrer / Faire / Défier / Retenir)</li>
+        <li>Défis validés automatiquement, quizz 3 questions avec feedback, progression persistée en <code>localStorage</code></li>
+        <li>Chapitre 4 : <strong>vraie cryptographie ECDSA P-256</strong> via SubtleCrypto, clés non-extractable</li>
+        <li>Chapitre 5 : simulation consensus à 5 nœuds, byzantins togglables, quorum 3/5 · 4/5 · 5/5</li>
+        <li>Chapitre 6 : mini-VM smart contract avec gas visible, limite économique palpable</li>
+        <li><strong>Glossaire flottant</strong> accessible sur toutes les pages (15 entrées)</li>
+        <li>Onboarding premier-run, tamper pré-explication, difficulté mining réglable, hash sandbox avec effet avalanche</li>
+        <li>Pages institutionnelles : à propos, docs, changelog (vous êtes ici)</li>
+        <li>Infra : GitHub Actions deploy Pages, CONTRIBUTING/CoC, issue/PR templates, sitemap, robots, OG image SVG, JSON-LD Course</li>
+      </ul>
+    </div>
+
+    <div class="cl-release" style="--c:#00ff88">
+      <h3>v2.3 <span class="tag">HARDENING</span> <span class="date">2026-04</span></h3>
+      <p class="cl-summary"><strong>La question :</strong> comment éviter que ce beau site ait des fuites mémoire, des couplages fragiles, des trous d'accessibilité ?</p>
+      <ul>
+        <li><strong>Lifecycle registry</strong> qui track tous les <code>setInterval</code> et <code>requestAnimationFrame</code>, cleanup sur <code>pagehide</code> (fixe zombie-audio)</li>
+        <li><strong>Event bus explicite</strong> entre core et extensions via <code>CustomEvent</code> — remplace trois <code>MutationObserver</code> fragiles</li>
+        <li><strong>Toast + modal primitives</strong> (<code>window.TSCUi</code>) — <code>alert()</code> et <code>confirm()</code> remplacés partout</li>
+        <li><code>safeSetItem</code> wrapper pour localStorage — quota-exceeded visible via toast</li>
+        <li>A11y baseline : <code>aria-label</code> sur CLI, focus trap sur explorer, <code>aria-live</code> sur compteur, wallet accessible clavier</li>
+        <li>Mining non-bloquant : boucle time-budgeted 6 ms + <code>scheduler.yield()</code> / <code>MessageChannel</code> fallback</li>
+        <li>Fix audio toggle : boot-promise guard + labels ON/OFF explicites</li>
+        <li>Fix sélection texte pendant drag tesseract</li>
+        <li>"Sommets illuminés" devient interactif (modal récap mining)</li>
+      </ul>
+    </div>
+
+    <div class="cl-release" style="--c:#8b5cf6">
+      <h3>v2.2 <span class="tag">REFACTOR</span> <span class="date">2026-04</span></h3>
+      <p class="cl-summary"><strong>La question :</strong> comment présenter ce projet sur GitHub avec la même rigueur qu'un projet pro ?</p>
+      <ul>
+        <li>Split du monolithe 2000 lignes en <code>index.html</code> + <code>styles/main.css</code> + <code>src/core.js</code> + <code>src/extensions.js</code></li>
+        <li>Extraction par <code>sed</code> (pas de retranscription manuelle — zéro risque de drift)</li>
+        <li>README complet (244 lignes), LICENSE MIT, .gitignore, favicon SVG standalone</li>
+        <li>Archives des versions monolithiques dans <code>archive/</code> pour traçabilité</li>
+      </ul>
+    </div>
+
+    <div class="cl-release" style="--c:#ff00d4">
+      <h3>v2.1 <span class="tag">BLOCKCHAIN VIVANTE</span> <span class="date">2026-04</span></h3>
+      <p class="cl-summary"><strong>La question :</strong> comment transformer une démo visuelle en vraie simulation interactive ?</p>
+      <ul>
+        <li><strong>Wallet persistant</strong> : identité générée par SHA-256, affichée dans le HUD, survit aux rechargements</li>
+        <li>Mining crédite le wallet <strong>+6,25 TSC par bloc</strong>, avec sommets illuminés sur le tesseract (jusqu'à 16)</li>
+        <li><strong>Mempool live</strong> + sparkline TPS dans la section simulation</li>
+        <li><strong>Explorateur de blocs</strong> slide-in avec merkle root visualisé en arbre binaire SVG</li>
+        <li>Mini-VM pour smart contracts (counter, vote) pilotable via CLI</li>
+        <li><strong>Mode x-ray</strong> (Konami) : dump JSON de l'état en direct</li>
+        <li>Glitch global + chromatic aberration sur cassure tamper</li>
+        <li>Tesseract section-aware : hue-rotate live selon la section visible</li>
+      </ul>
+    </div>
+
+    <div class="cl-release" style="--c:#ffcc3d">
+      <h3>v2.0 <span class="tag">PÉDAGOGIE</span> <span class="date">2026-04</span></h3>
+      <p class="cl-summary"><strong>La question :</strong> comment rendre ce beau site utile pour apprendre ?</p>
+      <ul>
+        <li>Meta SEO complètes, favicon SVG, <code>prefers-reduced-motion</code>, fallback <code>hover: none</code></li>
+        <li>Enrichissements pédagogiques par section (bandeau live hero, diagramme 1D→4D, chiffres sourcés, 4ᵉ nœud chronologique projectif)</li>
+        <li>Leaderboard local des blocs minés</li>
+        <li>CTAs outro (re-voir, whitepaper, partage X)</li>
+      </ul>
+    </div>
+
+    <div class="cl-release" style="--c:#00f0ff">
+      <h3>v1 <span class="tag">ARTIFACT</span> <span class="date">2026-04</span></h3>
+      <p class="cl-summary"><strong>La question :</strong> à quoi ressemblerait une présentation de la Blockchain 3.0 comme œuvre d'art ?</p>
+      <ul>
+        <li>Monolithe HTML de <strong>1268 lignes</strong> généré en une conversation avec Claude Artifacts</li>
+        <li>Tesseract 4D en WebGL (Three.js r128)</li>
+        <li>Minage SHA-256 réel via Web Crypto API</li>
+        <li>Cascade d'invalidation visible à l'œil nu dans la section tamper</li>
+        <li>Audio génératif (Tone.js) + HUD + CLI + boot sequence + curseur custom</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Un projet qui grandit par itérations atomiques. Chaque commit raconte une décision.</p>
+</div>
+<div class="fc"><h4>Découvrir</h4><ul><li>▸ <a href="index.html" style="color:inherit;text-decoration:none">Explorer libre</a></li><li>▸ <a href="academy.html" style="color:inherit;text-decoration:none">Académie</a></li></ul></div>
+<div class="fc"><h4>Projet</h4><ul><li>▸ <a href="about.html" style="color:inherit;text-decoration:none">À propos</a></li><li>▸ <a href="docs.html" style="color:inherit;text-decoration:none">Documentation</a></li><li>▸ <strong style="color:var(--cy)">Changelog</strong></li></ul></div>
+<div class="fc"><h4>Code</h4><ul><li>▸ <a href="https://github.com/LVcicario/Tesseract-Project" style="color:inherit;text-decoration:none">GitHub</a></li><li>▸ <a href="LICENSE" style="color:inherit;text-decoration:none">MIT</a></li><li>▸ <a href="CONTRIBUTING.md" style="color:inherit;text-decoration:none">Contribuer</a></li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN // CHANGELOG</span><span id="fcrd">—</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha384-c6Uo4N9c3SOEigMVzP6IshUG1wQ5uMp3xeoQFiHWAQ86joWdgyajkvopySyKy/Z6" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="src/lifecycle.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/core.js"></script>
+<script src="src/extensions.js"></script>
+<script src="src/academy.js"></script>
+</body>
+</html>
