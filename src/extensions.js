@@ -30,7 +30,11 @@
     STATE.wallet={addr,priv,balance:0,createdAt:Date.now()};
     try{localStorage.setItem(WK,JSON.stringify(STATE.wallet))}catch(e){}
   }
-  function walletSave(){try{localStorage.setItem(WK,JSON.stringify(STATE.wallet))}catch(e){}}
+  function walletSave(){
+    const safe=(window.TSCUi&&window.TSCUi.safeSetItem)||null;
+    if(safe)safe(WK,JSON.stringify(STATE.wallet));
+    else{try{localStorage.setItem(WK,JSON.stringify(STATE.wallet))}catch(_){}}
+  }
   function walletCredit(n){STATE.wallet.balance=+(STATE.wallet.balance+n).toFixed(4);walletSave();updateWalletUI();emit('wallet')}
   function walletDebit(n){if(STATE.wallet.balance<n)return false;STATE.wallet.balance=+(STATE.wallet.balance-n).toFixed(4);walletSave();updateWalletUI();return true}
   function updateWalletUI(){
@@ -189,7 +193,12 @@
   // ═══ Leaderboard + capture bloc miné → wallet + vertex mark ═══
   const lbRows=$('lbRows'),lbClear=$('lbClear'),mid=$('mid');
   function lbLoad(){try{return JSON.parse(localStorage.getItem(BK)||'[]')}catch(e){return[]}}
-  function lbSave(a){try{localStorage.setItem(BK,JSON.stringify(a.slice(0,16)))}catch(e){}}
+  function lbSave(a){
+    const safe=(window.TSCUi&&window.TSCUi.safeSetItem)||null;
+    const payload=JSON.stringify(a.slice(0,16));
+    if(safe)safe(BK,payload);
+    else{try{localStorage.setItem(BK,payload)}catch(_){}}
+  }
   function lbRender(){
     STATE.minedBlocks=lbLoad();
     renderVmarks();
@@ -222,6 +231,7 @@
     lbSave(a);
     lbRender();
     walletCredit(6.25);
+    if(window.TSCUi)window.TSCUi.toast('+6,25 TSC — bloc validé',{level:'success',duration:3200});
     if(window.Tone&&Tone.context&&Tone.context.state==='running'){
       try{
         const s=new Tone.Synth({oscillator:{type:'sine'},volume:-12,envelope:{attack:.01,decay:.4,sustain:0,release:.3}}).toDestination();
