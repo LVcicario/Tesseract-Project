@@ -7,7 +7,42 @@
 html,body{user-select:none;-webkit-user-select:none}
 main p,main li,main code,main strong,.hs,.ht,.st em,.qt,.cn,.ct,.si,.dd,.td,.ds,.tbd,.tbhs,.br strong,.mpr,.ml,.mv,.lvn,.lvr,.lvt,.hashlab-hash,.hashlab-input,.xtree,.xr,.tsc-modal__body,.tsc-toast__msg,.chist,.cin,.ch-lede,.ch-step__body,.ch-chall__prompt,.ch-chall__hash,.ch-q__t,.ch-summary li,.mempool-list,.srcnote,.fsrc,.fd{user-select:text;-webkit-user-select:text}
 #bgCanvas{user-select:none;-webkit-user-select:none;-webkit-user-drag:none}
-:root{--cy:#00f0ff;--mg:#ff00d4;--vi:#8b5cf6;--gd:#ffcc3d;--rd:#ff2244;--gr:#00ff88;--w:#e8ecff;--d:#a6aecc;--wk:#5a6488;--b:rgba(139,92,246,.14);--m:ui-monospace,'SF Mono',Menlo,Consolas,monospace;--s:ui-sans-serif,-apple-system,'Segoe UI',sans-serif;--dp:'Impact','Arial Narrow Bold',ui-sans-serif,sans-serif}
+:root{
+  /* ── Palette ──────────────────────────────────────────────── */
+  --cy:#00f0ff;          /* cyan    — primary accent */
+  --mg:#ff00d4;          /* magenta — secondary accent */
+  --vi:#8b5cf6;          /* violet  — structural lines */
+  --gd:#ffcc3d;          /* gold    — warnings/highlights */
+  --rd:#ff2244;          /* red     — errors/byzantine */
+  --gr:#00ff88;          /* green   — success/valid */
+  --w:#e8ecff;           /* white   — primary text */
+  --d:#a6aecc;           /* light   — body text (WCAG ≈ 9:1) */
+  --wk:#5a6488;          /* weak    — tertiary text */
+  --b:rgba(139,92,246,.14); /* border base — neutral violet @ 14 % */
+  /* ── Typography ──────────────────────────────────────────── */
+  --m:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --s:ui-sans-serif,-apple-system,'Segoe UI',sans-serif;
+  --dp:'Impact','Arial Narrow Bold',ui-sans-serif,sans-serif;
+  /* ── Design tokens (v2.2) ────────────────────────────────── */
+  --glow-sm:0 0 10px;        /* small glow / small cards */
+  --glow-md:0 0 20px;        /* medium glow / buttons */
+  --glow-lg:0 0 40px;        /* large glow / hero titles */
+  --glow-hero:0 0 80px;      /* oversized hero drop-shadow */
+  --blur-sm:8px;             /* light backdrop blur */
+  --blur-md:14px;            /* standard overlay blur */
+  --blur-lg:22px;            /* heavy panel blur */
+  --blur-xl:28px;            /* modal / CLI blur */
+  --ease-out-smooth:cubic-bezier(.2,.8,.2,1);  /* in/out panels */
+  --ease-out-fast:cubic-bezier(.25,.8,.25,1);  /* small transitions */
+  --dur-quick:.2s;
+  --dur-base:.3s;
+  --dur-slow:.7s;
+  --z-hud:100;
+  --z-overlay:4000;
+  --z-modal:4500;
+  --z-toast:5000;
+  --z-boot:10000;
+}
 html,body{background:#000;color:var(--w);font-family:var(--s);overflow-x:hidden;cursor:none;-webkit-font-smoothing:antialiased}
 body{min-height:100vh;position:relative}
 .cursor,.cdot{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;will-change:transform}
