@@ -154,6 +154,10 @@ async function runBoot(){
   setTimeout(()=>fl.classList.remove('on'),160);
   setTimeout(()=>{$('boot').classList.add('gone');$('boot').classList.remove('flash')},240);
   revealHero();
+  // Let extensions react once the user has settled on the hero for
+  // a moment — long enough to admire the title animation, short
+  // enough that onboarding still feels tied to the entry moment.
+  setTimeout(()=>window.dispatchEvent(new CustomEvent('tsc:bootComplete')),1800);
 }
 function revealHero(){
   const title='TESSERACT\nCHAIN';

@@ -17,7 +17,8 @@
   const on=f=>subs.push(f);
 
   // ═══ WALLET ═══
-  const WK='tsc.wallet.v1',BK='tsc.lb.v1';
+  const WK='tsc.wallet.v1',BK='tsc.lb.v1',OK='tsc.onboarded.v1';
+  let _firstRun=false;
   async function initWallet(){
     try{
       const raw=localStorage.getItem(WK);
@@ -28,6 +29,7 @@
     const addr='0x'+(await sha(seedHex)).slice(0,40);
     const priv='0x'+(await sha(seedHex+'|priv')).slice(0,64);
     STATE.wallet={addr,priv,balance:0,createdAt:Date.now()};
+    _firstRun=true;
     try{localStorage.setItem(WK,JSON.stringify(STATE.wallet))}catch(e){}
   }
   function walletSave(){
@@ -454,6 +456,41 @@
       }
     },true);
   }
+
+  // ═══ Onboarding first-run ═══
+  // When a brand-new wallet was generated this session, greet the user
+  // once the boot animation has settled. We persist a flag so the
+  // modal never shows twice — even if the user clears cookies and
+  // regenerates a wallet later, a returning visitor should not be
+  // interrupted with the same explainer.
+  function shouldOnboard(){
+    try{return _firstRun&&!localStorage.getItem(OK)}
+    catch(_){return _firstRun}
+  }
+  function markOnboarded(){
+    try{localStorage.setItem(OK,'1')}catch(_){}
+  }
+  function showOnboarding(){
+    if(!window.TSCUi)return;
+    const addr=STATE.wallet.addr||'0x…';
+    const short=addr.slice(0,10)+'…'+addr.slice(-6);
+    window.TSCUi.modal({
+      title:'Bienvenue dans la 4ᵉ dimension',
+      body:
+        '<p style="color:var(--w);font-size:14px;line-height:1.7;margin-bottom:18px">Une identité vient d\'être <strong style="color:var(--cy)">générée dans votre navigateur</strong> pour vous accompagner dans cette exploration :</p>'+
+        '<div class="row"><span class="label">Votre adresse</span><span class="val"><code>'+short+'</code></span></div>'+
+        '<div class="row"><span class="label">Solde initial</span><span class="val"><strong style="color:var(--gd)">0 TSC</strong></span></div>'+
+        '<div class="row"><span class="label">Stockage</span><span class="val">Local — ne quitte jamais votre appareil</span></div>'+
+        '<p style="margin-top:20px;color:var(--d);font-size:12px;line-height:1.7">Chaque bloc que vous minerez vous rapportera <strong style="color:var(--gd)">+6,25 TSC</strong>. Vos clés, votre solde et vos blocs sont sauvegardés dans ce navigateur — effacez le cache et tout disparaît. <strong style="color:var(--cy)">Aucun serveur, aucun compte</strong>.</p>'+
+        '<p style="margin-top:16px;color:var(--wk);font-size:11px;line-height:1.7">Cliquez sur votre wallet en haut à droite à tout moment pour revoir ces informations. Tapez <code style="color:var(--cy)">help</code> dans le terminal (touche <code style="color:var(--cy)">²</code> ou <code style="color:var(--cy)">~</code>) pour découvrir les commandes avancées.</p>',
+      actions:[
+        {label:'Commencer l\'exploration',kind:'primary',onClick:markOnboarded}
+      ]
+    });
+  }
+  window.addEventListener('tsc:bootComplete',()=>{
+    if(shouldOnboard())showOnboarding();
+  });
 
   // ═══ Filet de sécurité curseur ═══
   window.addEventListener('error',e=>{if(String(e.message||'').match(/cursor|cdot/i))document.documentElement.classList.add('no-cursor-js')});
