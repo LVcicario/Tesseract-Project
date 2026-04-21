@@ -661,10 +661,27 @@ async function rMine(){
 
   const bd=`${sIdx}|${sPrev}|${tic}|${nt()}`;
   const tS=performance.now();
-  let nc=0,h='';const BT=250;let lL=0,lS=0;
+  let nc=0,h='';let lL=0,lS=0;
+
+  // Time-budgeted mining loop: compute for at most FRAME_BUDGET_MS
+  // before yielding to the main thread, regardless of CPU speed.
+  // Fast cores get more hashes per chunk, slow cores fewer — the
+  // UX stays responsive either way. Previously a fixed BT=250
+  // chunk could stall low-end devices for >100ms.
+  const FRAME_BUDGET_MS=6;
+  const yieldToMain=()=>{
+    if(window.scheduler&&window.scheduler.yield)return window.scheduler.yield();
+    // MessageChannel yields much faster (~1ms) than setTimeout(0) (~4ms clamped).
+    return new Promise(r=>{
+      const ch=new MessageChannel();
+      ch.port1.onmessage=()=>r();
+      ch.port2.postMessage(0);
+    });
+  };
 
   while(true){
-    for(let i=0;i<BT;i++){
+    const chunkStart=performance.now();
+    while(performance.now()-chunkStart<FRAME_BUDGET_MS){
       h=await sha256(bd+'|'+nc);
       if(h.startsWith(DIFF))break;
       nc++;
@@ -680,8 +697,12 @@ async function rMine(){
       if(performance.now()-lS>400){lS=performance.now();sMh()}
       pVx(Math.floor(Math.random()*16));
     }
-    await new Promise(r=>setTimeout(r,0));
-    if(nc>2000000){mLog('⚠ abandon après 2M tentatives','err');mbtn.disabled=false;mbtn.textContent='⧫ RELANCER';return}
+    await yieldToMain();
+    if(nc>2000000){
+      mLog('⚠ abandon après 2M tentatives','err');
+      if(window.TSCUi)window.TSCUi.toast('Minage abandonné après 2M tentatives — relancez pour réessayer.',{level:'warn',duration:5000});
+      mbtn.disabled=false;mbtn.textContent='⧫ RELANCER';return;
+    }
   }
 
   const el=(performance.now()-tS)/1000,rt=Math.floor(nc/el);
