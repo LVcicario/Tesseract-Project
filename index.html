@@ -239,7 +239,10 @@
 <button class="rb" id="resetT" data-hover>↻ RÉINITIALISER</button>
 </div>
 <div class="tch" id="tch"></div>
-<div class="tanno" id="tanno">▸ <strong>Effet domino détecté.</strong> Le bloc modifié a changé de hash. Comme chaque bloc référence celui qui le précède, <strong>tous les suivants</strong> se retrouvent avec un hash-parent invalide. Aucun nœud honnête n'acceptera cette chaîne : elle est orpheline. <em>Coût pour un attaquant : re-miner tous les blocs postérieurs plus vite que le réseau honnête — exponentiellement improbable.</em></div>
+<div class="tanno tanno--teach" id="tanno" role="status" aria-live="polite">
+  <span class="tanno__state tanno__state--teach">▸ <strong>Ce que vous allez observer.</strong> Chaque bloc contient le hash du précédent. Si vous modifiez le bloc #001, son hash change. Le bloc #002 pointe alors vers un hash qui n'existe plus, son propre hash devient invalide, et ainsi de suite — la cassure se propage en cascade jusqu'au dernier bloc. Essayez : modifiez le champ jaune ci-dessus.</span>
+  <span class="tanno__state tanno__state--broken">▸ <strong>Cassure détectée.</strong> Le hash du bloc #001 a changé ; tous les blocs suivants pointent désormais vers un parent invalide. Aucun nœud honnête n'acceptera cette chaîne — elle est orpheline. <em>Coût pour un attaquant : re-miner tous les blocs postérieurs plus vite que le réseau honnête, et gagner plus de 50 % de la puissance globale. Exponentiellement improbable passé quelques blocs de profondeur.</em></span>
+</div>
 <div class="tcs" id="tcs"></div>
 </div>
 </div>

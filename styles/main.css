@@ -283,9 +283,14 @@ html.no-cursor-js,html.no-cursor-js body{cursor:auto!important}
 @media(max-width:900px){.tli.tli4{grid-template-columns:1fr;gap:25px}}
 
 /* Tamper : annotation contextuelle */
-.tanno{margin-top:22px;padding:16px 20px;border:1px dashed rgba(255,34,68,.4);background:rgba(255,34,68,.04);font-family:var(--m);font-size:11px;line-height:1.7;color:var(--d);display:none}
-.tanno.on{display:block;animation:fu .5s}
-.tanno strong{color:var(--rd);font-weight:600}
+/* Tamper annotation — two-state: teaching (cyan) then broken (red) */
+.tanno{margin-top:22px;padding:16px 20px;border:1px dashed rgba(0,240,255,.38);background:rgba(0,240,255,.04);font-family:var(--m);font-size:11.5px;line-height:1.7;color:var(--d);transition:border-color .5s,background .5s}
+.tanno__state{display:none}
+.tanno--teach .tanno__state--teach{display:inline}
+.tanno--broken{border-color:rgba(255,34,68,.45);background:rgba(255,34,68,.06);animation:fu .4s}
+.tanno--broken .tanno__state--broken{display:inline}
+.tanno--teach strong{color:var(--cy);font-weight:600}
+.tanno--broken strong{color:var(--rd);font-weight:600}
 
 /* Mining : leaderboard local */
 .lboard{margin-top:32px;padding:26px 24px;background:rgba(5,8,19,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--b)}

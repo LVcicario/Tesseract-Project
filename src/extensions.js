@@ -158,14 +158,22 @@
   }
 
   // ═══ Tamper : annotation + glitch global ═══
-  // Tamper break — listen to the explicit event emitted by core.rMine()'s
-  // sibling tEd(). The previous implementation observed DOM class changes
-  // on #tch which was fragile (coupled to core.js rendering internals).
+  // Tamper annotation — two-state:
+  //   - `.tanno--teach`  : visible from page load, explains what the
+  //                        user is about to see (pedagogy-first).
+  //   - `.tanno--broken` : swaps in when `tsc:tampered` fires with a
+  //                        non-zero broken count, replacing the
+  //                        teaching text with the forensic verdict.
   const tch=$('tch'),tanno=$('tanno');
+  function setTannoState(state){
+    if(!tanno)return;
+    tanno.classList.remove('tanno--teach','tanno--broken');
+    tanno.classList.add('tanno--'+state);
+  }
   window.addEventListener('tsc:tampered',e=>{
     const broken=(e.detail&&e.detail.brokenCount)||0;
     if(broken>0){
-      if(tanno)tanno.classList.add('on');
+      setTannoState('broken');
       const tw=document.querySelector('.tw');
       if(tw&&!tw.classList.contains('shake')){
         tw.classList.add('shake');
@@ -176,17 +184,16 @@
         triggerGlitch();
         setTimeout(()=>{delete tch.dataset.glitched},800);
       }
-    } else if(tanno){
-      tanno.classList.remove('on');
+    }else{
+      setTannoState('teach');
     }
   });
-  // Also listen to the tamper reset (when user clicks "réinitialiser") —
-  // we watch #tch attribute changes just to clear the annotation when
-  // invalid blocks disappear. This observer is scoped to a single
-  // attribute and registered for cleanup on pagehide.
+  // When the user resets the tamper chain (core.js rTmp()), #tch no
+  // longer carries any .tb.invalid descendant — flip the annotation
+  // back to the teaching copy. Scoped, disconnected on pagehide.
   if(tch){
     const resetObserver=new MutationObserver(()=>{
-      if(!tch.querySelector('.tb.invalid')&&tanno)tanno.classList.remove('on');
+      if(!tch.querySelector('.tb.invalid'))setTannoState('teach');
     });
     resetObserver.observe(tch,{subtree:true,attributes:true,attributeFilter:['class']});
     window.addEventListener('pagehide',()=>resetObserver.disconnect());
