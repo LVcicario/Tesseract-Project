@@ -639,6 +639,44 @@ body[data-page="academy"] #boot,body[data-page="academy"] .shint{display:none!im
 .ch3-mine__log .needle{color:var(--mg);word-break:break-all}
 @media(max-width:720px){.ch3-mine{grid-template-columns:1fr}}
 
+/* Chapter 4 — identity keypair + signature */
+.ch4-id{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+.ch4-id__col{background:#000;border:1px solid var(--b);padding:18px;font-family:var(--m);font-size:11px}
+.ch4-id__col h4{font-size:10px;letter-spacing:.28em;color:var(--gd);margin:0 0 14px;text-transform:uppercase;font-weight:700}
+.ch4-id__col.priv{border-color:rgba(255,34,68,.35)}
+.ch4-id__col.priv h4{color:var(--rd)}
+.ch4-id__col.pub{border-color:rgba(0,255,136,.35)}
+.ch4-id__col.pub h4{color:var(--gr)}
+.ch4-id__val{word-break:break-all;color:var(--d);line-height:1.55;font-size:10.5px;min-height:54px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px dashed var(--b)}
+.ch4-id__val--redact{color:var(--rd);font-style:italic}
+.ch4-id__meta{margin-top:10px;color:var(--wk);font-size:10px;letter-spacing:.12em;line-height:1.55}
+.ch4-gen{width:100%;font-family:var(--m);font-size:11px;letter-spacing:.28em;padding:12px;background:transparent;border:1px solid var(--gd);color:var(--gd);cursor:none;text-transform:uppercase;transition:all .2s;margin-top:10px}
+.ch4-gen:hover:not(:disabled),.ch4-gen:focus-visible{background:var(--gd);color:#000;outline:none}
+.ch4-gen:disabled{opacity:.5;cursor:wait}
+
+.ch4-sign{margin-top:20px;padding:22px;background:#000;border:1px solid var(--b)}
+.ch4-sign h4{font-family:var(--m);font-size:10px;letter-spacing:.28em;color:var(--cy);margin:0 0 12px;text-transform:uppercase;font-weight:700}
+.ch4-sign label{display:block;font-size:10px;color:var(--wk);margin:10px 0 5px;letter-spacing:.18em;text-transform:uppercase}
+.ch4-sign textarea,.ch4-sign input{width:100%;background:#000;border:1px solid var(--b);color:var(--w);font-family:var(--m);font-size:12px;padding:10px 12px;outline:none;resize:vertical;min-height:44px}
+.ch4-sign textarea:focus,.ch4-sign input:focus{border-color:var(--cy);box-shadow:0 0 0 2px rgba(0,240,255,.2)}
+.ch4-sign__sig{font-family:var(--m);font-size:10.5px;color:var(--mg);word-break:break-all;padding:10px 12px;background:rgba(255,0,212,.04);border:1px dashed rgba(255,0,212,.3);margin-top:10px;min-height:48px;line-height:1.55}
+.ch4-sign__actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.ch4-sign__btn{font-family:var(--m);font-size:10.5px;letter-spacing:.22em;padding:9px 14px;background:transparent;border:1px solid var(--b);color:var(--d);cursor:none;text-transform:uppercase;transition:all .2s;flex:1;min-width:110px}
+.ch4-sign__btn:hover:not(:disabled),.ch4-sign__btn:focus-visible{outline:none}
+.ch4-sign__btn--sign{border-color:var(--mg);color:var(--mg)}
+.ch4-sign__btn--sign:hover:not(:disabled){background:var(--mg);color:#000}
+.ch4-sign__btn--verify{border-color:var(--gr);color:var(--gr)}
+.ch4-sign__btn--verify:hover:not(:disabled){background:var(--gr);color:#000}
+.ch4-sign__btn--tamper{border-color:var(--rd);color:var(--rd)}
+.ch4-sign__btn--tamper:hover:not(:disabled){background:var(--rd);color:#000}
+.ch4-sign__btn:disabled{opacity:.4;cursor:not-allowed}
+.ch4-sign__res{margin-top:12px;padding:12px 14px;font-family:var(--m);font-size:11px;line-height:1.6;display:none;border-left:2px solid var(--wk)}
+.ch4-sign__res.on{display:block;animation:fu .3s}
+.ch4-sign__res--ok{border-color:var(--gr);background:rgba(0,255,136,.05);color:var(--gr)}
+.ch4-sign__res--ko{border-color:var(--rd);background:rgba(255,34,68,.06);color:var(--rd)}
+.ch4-sign__res strong{color:var(--w)}
+@media(max-width:720px){.ch4-id{grid-template-columns:1fr}}
+
 /* ═══ v2.2 — Glossaire flottant ═══ */
 .gloss{border-bottom:1px dashed rgba(0,240,255,.55);cursor:none;color:inherit;transition:color .18s}
 .gloss:hover,.gloss:focus-visible{color:var(--cy);outline:none}

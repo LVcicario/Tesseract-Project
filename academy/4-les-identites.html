@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 4 — Les identités · TESSERACT.CHAIN Académie</title>
+<meta name="description" content="Quatrième leçon : clé privée, clé publique, signature. Comment prouver son identité sans jamais révéler son mot de passe.">
+<meta name="theme-color" content="#ffcc3d">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Chapitre 4 — Les identités">
+<meta property="og:description" content="Signatures cryptographiques réelles, via ECDSA natif du navigateur.">
+<meta property="og:type" content="article">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-page="chapter">
+<noscript><div class="nojs"><div><h1>TESSERACT.CHAIN — Chapitre 4</h1><p>Ce chapitre a besoin de JavaScript pour fonctionner. Activez-le, puis rechargez la page.</p></div></div></noscript>
+
+<div id="chromAb" aria-hidden="true"></div>
+<button type="button" class="vertexmark" id="vmark" aria-label="Blocs minés — cliquez pour voir vos statistiques">◆ SOMMETS ILLUMINÉS <strong id="vmCount">0</strong>/16<span class="vm-dots" id="vmDots" aria-hidden="true"></span><span class="vertexmark__hint">▸ CLIC POUR DÉTAIL</span></button>
+<aside id="explorer" role="dialog" aria-modal="true" aria-labelledby="xhTitle" aria-hidden="true">
+  <div class="xh"><div class="xh-t" id="xhTitle">Bloc #---</div><button class="xh-c" id="xhClose" data-hover>✕ FERMER</button></div>
+  <div id="xBody"></div>
+</aside>
+<div id="xray" role="dialog" aria-label="Mode rayons-X">
+  <button class="xclose" id="xrClose" data-hover>✕ SORTIR</button>
+  <h3>◆ MODE RAYONS-X — STATE.SNAPSHOT</h3>
+  <pre id="xrDump">—</pre>
+</div>
+
+<div id="flash"></div>
+<div id="redFlood"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cdot" id="cdot"></div>
+
+<div id="cli">
+<div class="ch"><span>TESSERACT.CLI</span><span>help ● ESC pour fermer</span></div>
+<div class="chist" id="chist"></div>
+<div class="ci"><label for="cin" class="cp">tesseract@chain:~$</label><input class="cin" id="cin" autocomplete="off" spellcheck="false" aria-label="Terminal TESSERACT.CHAIN — tapez help puis Entrée" aria-describedby="cinHint"><span id="cinHint" class="visually-hidden">Tapez une commande et appuyez sur Entrée. Tapez help pour la liste des commandes.</span></div>
+</div>
+
+<div class="hud">
+<div><div class="hd"></div><span>TESSERACT.CHAIN</span><span style="color:var(--wk)">//</span><span>CH_04</span></div>
+<div>
+<span>NODES <strong id="hn">256</strong></span>
+<span>TPS <strong id="htps">0</strong></span>
+<span id="htime">00:00:00 UTC</span>
+<button class="hb" id="audioBtn" data-hover>♪ AUDIO</button>
+<a class="hb hb--nav" href="../academy.html" data-hover>◆ ACADÉMIE</a>
+<span class="hwallet" id="hwallet" data-hover title="Votre wallet simulé — cliquez pour détails"><span class="dot"></span><span class="hw-addr" id="hwAddr">0x---</span><span class="hw-bal"><span id="hwBal">0</span> TSC</span></span>
+<button class="hb" id="cliBtn" data-hover>▸ CLI</button>
+</div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-ov"></div>
+
+<main>
+
+<section id="ch-hero">
+<div class="inner" style="--c:#ffcc3d">
+  <nav class="ch-crumb" aria-label="Fil d'Ariane">
+    <a href="../academy.html">Académie</a>
+    <span class="sep">/</span>
+    <span class="curr">Chapitre 4</span>
+  </nav>
+  <div class="ch-num">CHAPITRE 04 · ★★ INTERMÉDIAIRE</div>
+  <h1 class="ch-title">Les <em>identités</em>.<br>Signer sans dire.</h1>
+  <p class="ch-lede">Sans banque, sans administration, sans mot de passe à un serveur : comment prouves-tu que c'est <strong>toi</strong> qui as décidé d'envoyer cette transaction ? La réponse tient en deux clés et une signature mathématique. Dans ce chapitre, tu génères <strong>une vraie paire de clés cryptographiques</strong> dans ton navigateur — avec l'API que Chrome, Firefox et Safari implémentent de la même façon.</p>
+  <div class="ch-meta"><span>Durée <strong>≈ 12 min</strong></span><span>Niveau <strong>★★ Intermédiaire</strong></span><span>Prérequis <strong>Chapitres 1 à 3</strong></span></div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ffcc3d">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">01</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Raconter</div>
+      <h2 class="ch-step__t">Deux clés qui <em>vont ensemble</em>.</h2>
+      <p>L'idée — dingue quand tu la rencontres pour la première fois — s'appelle la <strong>cryptographie asymétrique</strong>. Tu génères d'un coup <strong>deux</strong> clés mathématiquement liées :</p>
+      <ul>
+        <li>Une <strong style="color:var(--rd)">clé privée</strong> : tu la gardes, tu ne la montres à personne. Elle te sert à <span class="gloss" data-term="signature">signer</span>.</li>
+        <li>Une <strong style="color:var(--gr)">clé publique</strong> : tu la diffuses à qui veut. Elle permet de <strong>vérifier</strong> tes signatures.</li>
+      </ul>
+      <p>De la clé privée, on peut facilement déduire la clé publique. Dans l'autre sens, impossible : sauf à essayer <em>toutes</em> les clés privées possibles, ce qui prendrait plus longtemps que l'âge de l'univers. Cette asymétrie calculatoire, c'est ce qui rend la cryptographie à clé publique à la fois solide et utilisable.</p>
+      <div class="ch-analogy">
+        <strong>Analogie.</strong> Imagine une <strong>boîte aux lettres avec deux serrures distinctes</strong>. Une serrure ferme (la clé publique : tout le monde peut déposer un message signé en ton nom... non, inverse), et une serrure ouvre (la clé privée : toi seul peux prouver qu'un message vient bien de toi). Dans le monde blockchain, on ne chiffre pas : on <strong>signe</strong>. Ta clé privée produit un <em>sceau</em> inimitable attaché à chaque transaction.
+      </div>
+      <p>Ton adresse blockchain (celle que tu vois en haut à droite sur ce site) est un <strong>hash</strong> de ta clé publique. La clé publique elle-même n'apparaît que lors d'une première signature.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ffcc3d">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">02</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Montrer</div>
+      <h2 class="ch-step__t">Génère une <em>vraie</em> paire de clés.</h2>
+      <p>Ci-dessous, ton navigateur va générer une paire de clés <strong>ECDSA sur la courbe P-256</strong> — le standard utilisé par les signatures HTTPS, le passeport biométrique, et Ethereum (sur une autre courbe). L'API utilisée est <code>crypto.subtle.generateKey</code>, native à tous les navigateurs modernes.</p>
+      <p>La clé privée générée est marquée <code>non-extractable</code> : même le code JavaScript qui l'a créée ne peut pas la récupérer en clair. Elle ne vit que dans le coffre cryptographique du navigateur, et disparaît quand tu fermes l'onglet.</p>
+      <div class="ch-demo">
+        <div class="ch-demo-label">▸ LABORATOIRE DE CLÉS · ECDSA / P-256</div>
+        <div class="ch4-id">
+          <div class="ch4-id__col priv">
+            <h4>🔒 Clé privée</h4>
+            <div class="ch4-id__val ch4-id__val--redact" id="ch4Priv">— (cliquez sur générer)</div>
+            <div class="ch4-id__meta">Non-extractable · vit dans le coffre du navigateur · disparaît à la fermeture de l'onglet</div>
+          </div>
+          <div class="ch4-id__col pub">
+            <h4>🔓 Clé publique</h4>
+            <div class="ch4-id__val" id="ch4Pub">— (cliquez sur générer)</div>
+            <div class="ch4-id__meta" id="ch4Meta">Format JWK · courbe P-256 · 256 bits de sécurité</div>
+          </div>
+        </div>
+        <button type="button" class="ch4-gen" id="ch4Gen" data-hover>⟲ GÉNÉRER UNE NOUVELLE PAIRE</button>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#ff00d4">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">03</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Faire · Défier</div>
+      <h2 class="ch-step__t">Signe. Vérifie. <em>Tente</em> de falsifier.</h2>
+      <p>Maintenant qu'une paire de clés existe, l'opération fondamentale est : <strong>signer</strong> un message avec la clé privée, puis <strong>vérifier</strong> cette signature avec la clé publique. Toute modification du message, même d'un seul octet, invalide la signature.</p>
+      <p>Pour valider ce chapitre, tu vas :</p>
+      <ul>
+        <li><strong>(1)</strong> Signer le message proposé.</li>
+        <li><strong>(2)</strong> Vérifier la signature — elle doit être valide.</li>
+        <li><strong>(3)</strong> Modifier <strong>une seule lettre</strong> du message, re-vérifier — la signature doit être rejetée. C'est ça, le défi.</li>
+      </ul>
+      <div class="ch-chall" data-challenge="4.sign-verify-tamper">
+        <div class="ch-chall__h">
+          <span class="ch-chall__k">◆ DÉFI // SIGNER, VÉRIFIER, FALSIFIER</span>
+          <span class="ch-chall__status" id="ch4ChallStatus">EN ATTENTE</span>
+        </div>
+        <div class="ch4-sign">
+          <h4>Message à signer</h4>
+          <label for="ch4Msg">Texte libre</label>
+          <textarea id="ch4Msg">Je soussigné, confirme cette transaction.</textarea>
+          <label for="ch4Sig">Signature (hex)</label>
+          <div class="ch4-sign__sig" id="ch4Sig">—</div>
+          <div class="ch4-sign__actions">
+            <button type="button" class="ch4-sign__btn ch4-sign__btn--sign" id="ch4DoSign" data-hover disabled>✒ Signer</button>
+            <button type="button" class="ch4-sign__btn ch4-sign__btn--verify" id="ch4DoVerify" data-hover disabled>✓ Vérifier</button>
+            <button type="button" class="ch4-sign__btn ch4-sign__btn--tamper" id="ch4DoTamper" data-hover disabled>✗ Modifier 1 lettre</button>
+          </div>
+          <div class="ch-chall__tries"><span>Étape <strong id="ch4Step">0</strong> / 3</span><span id="ch4Guide">Génère d'abord une paire de clés ci-dessus</span></div>
+          <div class="ch-chall__feedback" id="ch4Feedback" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ch-section" style="--c:#00ff88">
+<div class="inner">
+  <div class="ch-step">
+    <div class="ch-step__n">05</div>
+    <div class="ch-step__body">
+      <div class="ch-step__kicker">Retenir</div>
+      <h2 class="ch-step__t">Ce qu'il faut <em>garder</em>.</h2>
+      <div class="ch-summary">
+        <div class="ch-summary__k">◆ À RETENIR</div>
+        <ul>
+          <li>La <strong>cryptographie asymétrique</strong> utilise deux clés liées mathématiquement : privée (pour signer) et publique (pour vérifier).</li>
+          <li>De la clé privée, on déduit facilement la clé publique. L'inverse est <strong>pratiquement impossible</strong>.</li>
+          <li>Signer un message produit une signature <strong>unique pour ce message précis</strong>. Changer un octet invalide la signature.</li>
+          <li>Ton <strong>adresse</strong> blockchain est un hash de ta clé publique. Personne ne voit ta clé privée, pas même le réseau.</li>
+          <li>ECDSA sur P-256 (ou secp256k1 côté Bitcoin/Ethereum) est implémenté <strong>nativement</strong> dans tous les navigateurs modernes — pas de librairie externe nécessaire.</li>
+        </ul>
+      </div>
+
+      <div class="ch-quiz" aria-label="Quiz de fin de chapitre">
+        <div class="ch-quiz__k">◆ QUIZ // 3 QUESTIONS</div>
+
+        <div class="ch-q" data-q="1" data-correct="1">
+          <div class="ch-q__num">QUESTION 1 / 3</div>
+          <div class="ch-q__t">Quelle clé sert à <strong>signer</strong> une transaction ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>La clé publique.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>La clé privée.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Les deux conjointement.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Signer = prouver la détention.</strong> La clé privée prouve que tu possèdes l'identité. La clé publique permet aux autres de vérifier sans accéder à ta clé.</div>
+        </div>
+
+        <div class="ch-q" data-q="2" data-correct="2">
+          <div class="ch-q__num">QUESTION 2 / 3</div>
+          <div class="ch-q__t">Si je modifie <strong>un seul caractère</strong> du message signé, la signature…</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>reste valide.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>change d'un caractère elle aussi.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>devient invalide (et aucune nouvelle signature n'est devinable sans la clé privée).</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Rigueur binaire.</strong> Une signature ne s'abîme pas par degré — elle est soit valide, soit invalide. C'est cette radicalité qui rend la blockchain non-falsifiable par des modifications subtiles.</div>
+        </div>
+
+        <div class="ch-q" data-q="3" data-correct="1">
+          <div class="ch-q__num">QUESTION 3 / 3</div>
+          <div class="ch-q__t">Que se passe-t-il si tu <strong>perds ta clé privée</strong> ?</div>
+          <div class="ch-q__opts">
+            <button type="button" class="ch-q__opt" data-opt="0"><span class="ch-q__opt-mark">A</span><span>Tu peux la redemander au support.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="1"><span class="ch-q__opt-mark">B</span><span>Tu perds à jamais l'accès à l'adresse associée.</span></button>
+            <button type="button" class="ch-q__opt" data-opt="2"><span class="ch-q__opt-mark">C</span><span>Le réseau reconstitue la clé depuis le hash.</span></button>
+          </div>
+          <div class="ch-q__feedback"><strong>Pas de filet.</strong> Il n'y a <em>personne</em> qui a le pouvoir de récupérer ta clé. C'est la contrepartie de l'autonomie totale — et la raison pour laquelle on parle tant de sauvegardes, de phrases mnémoniques et de portefeuilles matériels.</div>
+        </div>
+
+        <div class="ch-quiz__score" id="ch4QuizScore">
+          <div class="ch-quiz__score-l">Score</div>
+          <div class="ch-quiz__score-n"><span id="ch4QuizN">0</span><span style="color:var(--wk)">/3</span></div>
+          <div class="ch-quiz__score-l" id="ch4QuizMsg">—</div>
+        </div>
+      </div>
+
+      <nav class="ch-nav" aria-label="Navigation entre chapitres">
+        <a class="ch-nav__prev" href="3-course-au-nonce.html"><span class="ch-nav__k">◂ précédent</span><span class="ch-nav__t">Chapitre 3 · La course au nonce</span></a>
+        <span class="ch-nav__next ch-nav__locked"><span class="ch-nav__k">suivant ▸</span><span class="ch-nav__t">Chapitre 5 · bientôt</span></span>
+      </nav>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="fi">
+<div>
+<div class="ft">TESSERACT.CHAIN</div>
+<p class="fd">Chapitre 4 du parcours Académie — cryptographie à clé publique, signatures ECDSA réelles via Web Crypto API native.</p>
+</div>
+<div class="fc"><h4>Parcours</h4><ul><li>▸ <a href="1-le-hash.html" style="color:inherit;text-decoration:none">Chapitre 1 — Le hash</a></li><li>▸ <a href="2-le-bloc.html" style="color:inherit;text-decoration:none">Chapitre 2 — Le bloc</a></li><li>▸ <a href="3-course-au-nonce.html" style="color:inherit;text-decoration:none">Chapitre 3 — La course au nonce</a></li><li>▸ <strong style="color:var(--gd)">Chapitre 4 — Les identités</strong></li><li>▸ Chapitre 5 — Le consensus</li><li>▸ Chapitre 6 — Les programmes</li></ul></div>
+<div class="fc"><h4>Ressources</h4><ul><li>▸ SubtleCrypto API</li><li>▸ ECDSA (FIPS 186-4)</li><li>▸ secp256k1 vs P-256</li></ul></div>
+<div class="fc"><h4>Contrôles</h4><ul><li>▸ ² ou ~ : CLI</li><li>▸ clic terme souligné : glossaire</li><li>▸ Esc : fermer overlay</li></ul></div>
+</div>
+<div class="fb"><span>© TESSERACT.CHAIN — CHAPITRE 4 // MIT</span><span id="fcrd">CH 04/06</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="../src/lifecycle.js"></script>
+<script src="../src/ui.js"></script>
+<script src="../src/core.js"></script>
+<script src="../src/extensions.js"></script>
+<script src="../src/academy.js"></script>
+<script src="../src/chapter-4.js"></script>
+</body>
+</html>
