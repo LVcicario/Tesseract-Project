@@ -131,6 +131,52 @@
     dots.innerHTML=Array.from({length:16},(_,i)=>`<span class="vm-dot ${i<n?'lit':''}"></span>`).join('');
   }
 
+  // Clicking the vertex marker opens a stats recap modal and offers
+  // a shortcut to the mining section or to the explorer on the most
+  // recent block the user mined.
+  (function installVertexMarkModal(){
+    const vm=$('vmark');if(!vm)return;
+    function fmtSec(s){return (s||0).toFixed(2)+' s'}
+    function open(){
+      const blocks=STATE.minedBlocks||[];
+      if(!window.TSCUi)return;
+      if(!blocks.length){
+        window.TSCUi.modal({
+          title:'Vos sommets illuminés',
+          body:'<p>Chaque bloc que vous minerez allume un sommet du tesseract en arrière-plan — jusqu\'à <strong style="color:var(--gd)">16 sommets</strong>. Vous n\'en avez encore allumé aucun.</p><p style="margin-top:14px;color:var(--wk);font-size:11px;line-height:1.7">Rendez-vous dans la section <strong style="color:var(--cy)">Proof of Work</strong> et lancez le minage — votre premier hash valide vaut +6,25 TSC.</p>',
+          actions:[
+            {label:'Aller au minage',kind:'primary',onClick:()=>{const m=document.getElementById('mining');if(m)m.scrollIntoView({behavior:'smooth'})}},
+            {label:'Fermer',kind:'ghost'}
+          ]
+        });
+        return;
+      }
+      const total=blocks.length;
+      const avg=blocks.reduce((a,b)=>a+(b.t||0),0)/total;
+      const fastest=blocks.reduce((a,b)=>(b.t&&b.t<a.t?b:a),blocks[0]);
+      const totalReward=(total*6.25).toLocaleString('fr-FR',{maximumFractionDigits:2});
+      window.TSCUi.modal({
+        title:'Vos sommets illuminés',
+        body:
+          '<div class="row"><span class="label">Blocs minés</span><span class="val"><strong style="color:var(--gd)">'+total+' / 16</strong></span></div>'+
+          '<div class="row"><span class="label">Récompense totale</span><span class="val"><strong style="color:var(--gd)">+'+totalReward+' TSC</strong></span></div>'+
+          '<div class="row"><span class="label">Temps moyen</span><span class="val"><strong style="color:var(--cy)">'+fmtSec(avg)+'</strong></span></div>'+
+          '<div class="row"><span class="label">Meilleur temps</span><span class="val"><strong style="color:var(--cy)">'+fmtSec(fastest.t)+'</strong> · nonce '+(fastest.nonce||0).toLocaleString('fr-FR')+'</span></div>'+
+          '<div class="row"><span class="label">Dernier hash</span><span class="val"><code>0x'+blocks[0].h.slice(0,32)+'…</code></span></div>'+
+          '<p style="margin-top:16px;color:var(--wk);font-size:11px;line-height:1.65">Chaque sommet illuminé reste allumé à jamais dans ce navigateur. Continuez à miner pour en débloquer plus — le tesseract compte 16 sommets au total.</p>',
+        actions:[
+          {label:'Explorer le dernier bloc',kind:'ghost',onClick:()=>openExplorer(0)},
+          {label:'Aller au minage',kind:'ghost',onClick:()=>{const m=document.getElementById('mining');if(m)m.scrollIntoView({behavior:'smooth'})}},
+          {label:'Fermer',kind:'primary'}
+        ]
+      });
+    }
+    vm.addEventListener('click',open);
+    vm.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}
+    });
+  })();
+
   // ═══ Glitch / chromatic aberration ═══
   function triggerGlitch(){
     document.body.classList.add('glitch');
